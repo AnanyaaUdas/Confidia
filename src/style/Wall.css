@@ -1,0 +1,494 @@
+/* =========================
+   WALL PAGE
+========================= */
+
+.wall-page {
+  min-height: 100vh;
+  background: #fff9fd;
+  padding-bottom: 100px;
+}
+
+
+/* =========================
+   WALL HEADER
+========================= */
+
+.wall-header {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 28px 0 30px;
+}
+
+.wall-header h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 38px;
+  color: #38345a;
+  font-weight: 700;
+}
+
+.wall-header p {
+  margin-top: 5px;
+  margin-bottom: 0;
+  color: #887fa8;
+  font-size: 17px;
+}
+
+
+/* =========================
+   CARD GRID
+========================= */
+
+.compliment-grid {
+  max-width: 1220px;
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 22px;
+
+  align-items: start;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.compliment-card {
+  background: white;
+
+  border: 1px solid #eee7ff;
+
+  border-radius: 30px;
+
+  padding: 28px 27px;
+
+  box-shadow:
+    0 15px 35px rgba(94, 71, 145, 0.08);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.compliment-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 20px 45px rgba(94, 71, 145, 0.13);
+}
+
+
+/* =========================
+   CARD TOP
+========================= */
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.featured-label {
+  color: #ff6da8;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 12px;
+}
+
+.anonymous {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #3d385d;
+
+  font-size: 18px;
+
+  font-weight: 600;
+}
+
+.card-emoji {
+  font-size: 22px;
+}
+
+
+/* =========================
+   TO
+========================= */
+
+.card-to {
+  margin-top: 17px;
+
+  color: #777096;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.card-message {
+  margin: 13px 0 22px;
+
+  color: #625b79;
+
+  font-size: 20px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================
+   TIME
+========================= */
+
+.card-time {
+  color: #9188ad;
+
+  font-size: 13px;
+
+  margin-bottom: 20px;
+}
+
+
+/* =========================
+   REACTIONS
+========================= */
+
+.reaction-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.reaction-btn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 16px;
+
+  border: 1px solid #ebe4ff;
+
+  background: white;
+
+  border-radius: 30px;
+
+  color: #514b6d;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+.reaction-btn:hover {
+  background: #fff2fa;
+
+  transform: translateY(-2px);
+}
+
+.report-btn {
+  margin-left: auto;
+
+  border: none;
+
+  background: transparent;
+
+  color: #9188ad;
+
+  cursor: pointer;
+
+  font-size: 13px;
+}
+
+
+/* =========================
+   DIVIDER
+========================= */
+
+.card-divider {
+  margin: 16px 0;
+
+  border-top: 1px dashed #e7def7;
+}
+
+
+/* =========================
+   REPLY
+========================= */
+
+.reply-toggle {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  color: #766b9a;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   REPLY BOX
+========================= */
+
+.reply-box {
+  display: flex;
+
+  gap: 9px;
+
+  margin-top: 16px;
+}
+
+.reply-box input {
+  min-width: 0;
+
+  flex: 1;
+
+  border: 1px solid #e7def7;
+
+  border-radius: 18px;
+
+  padding: 13px 17px;
+
+  outline: none;
+
+  font-size: 13px;
+}
+
+.reply-box input:focus {
+  border-color: #c8a7ff;
+}
+
+.send-btn {
+  border: none;
+
+  border-radius: 22px;
+
+  padding: 0 19px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f29ac8,
+      #a777ed
+    );
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   WHOLE WALL BUTTON
+========================= */
+
+.whole-wall {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 32px;
+}
+
+.whole-wall-btn {
+  padding: 15px 28px;
+
+  border: 1px solid #e6ddfa;
+
+  border-radius: 30px;
+
+  background: white;
+
+  color: #4a4368;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.whole-wall-btn:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 25px rgba(100, 80, 150, 0.1);
+}
+
+
+/* =========================
+   KINDNESS PROFILE
+========================= */
+
+.kindness-profile {
+  max-width: 1220px;
+
+  margin: 45px auto 0;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-end;
+}
+
+.kindness-profile h2 {
+  margin: 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  color: #38345a;
+
+  font-size: 34px;
+}
+
+.kindness-profile p {
+  margin-top: 7px;
+
+  color: #9188ad;
+
+  font-size: 16px;
+}
+
+.profile-btn {
+  padding: 13px 22px;
+
+  border: 1px solid #e7def7;
+
+  border-radius: 30px;
+
+  background: white;
+
+  color: #625b79;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   FIXED SHARE BUTTON
+========================= */
+
+.wall-share-btn {
+  position: fixed;
+
+  right: 28px;
+
+  bottom: 25px;
+
+  z-index: 1000;
+
+  padding: 16px 27px;
+
+  border: none;
+
+  border-radius: 40px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f15eaa,
+      #9158e8
+    );
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 30px rgba(123, 97, 255, 0.28);
+
+  transition: 0.3s;
+}
+
+.wall-share-btn:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 17px 35px rgba(123, 97, 255, 0.35);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+  .wall-header,
+  .compliment-grid,
+  .kindness-profile {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+
+  .compliment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 650px) {
+
+  .wall-header,
+  .compliment-grid,
+  .kindness-profile {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .compliment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kindness-profile {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 20px;
+  }
+
+  .reaction-row {
+    flex-wrap: wrap;
+  }
+
+}
