@@ -1,494 +1,785 @@
-/* =========================
+/* =====================================================
    WALL PAGE
-========================= */
+===================================================== */
 
 .wall-page {
-  min-height: 100vh;
-  background: #fff9fd;
-  padding-bottom: 100px;
+    min-height: 100vh;
+    width: 100%;
+
+    background: #fff9fd;
+
+    padding-bottom: 100px;
+
+    overflow-x: hidden;
 }
 
 
-/* =========================
+/* =====================================================
    WALL HEADER
-========================= */
+===================================================== */
 
 .wall-header {
-  max-width: 1220px;
-  margin: 0 auto;
-  padding: 28px 0 30px;
+    max-width: 1220px;
+
+    margin: 0 auto;
+
+    padding: 28px 0 30px;
 }
 
 .wall-header h1 {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 38px;
-  color: #38345a;
-  font-weight: 700;
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 38px;
+
+    color: #38345a;
+
+    font-weight: 700;
 }
 
 .wall-header p {
-  margin-top: 5px;
-  margin-bottom: 0;
-  color: #887fa8;
-  font-size: 17px;
+    margin-top: 5px;
+
+    margin-bottom: 0;
+
+    color: #887fa8;
+
+    font-size: 17px;
 }
 
 
-/* =========================
+/* =====================================================
    CARD GRID
-========================= */
+===================================================== */
 
 .compliment-grid {
-  max-width: 1220px;
-  margin: 0 auto;
+    max-width: 1220px;
 
-  display: grid;
+    margin: 0 auto;
 
-  grid-template-columns:
-    repeat(3, 1fr);
+    display: grid;
 
-  gap: 22px;
+    grid-template-columns: repeat(3, 1fr);
 
-  align-items: start;
+    gap: 22px;
+
+    align-items: start;
 }
 
 
-/* =========================
+/* =====================================================
    CARD
-========================= */
+===================================================== */
 
 .compliment-card {
-  background: white;
+    position: relative;
 
-  border: 1px solid #eee7ff;
+    background: white;
 
-  border-radius: 30px;
+    border: 1px solid #eee7ff;
 
-  padding: 28px 27px;
+    border-radius: 30px;
 
-  box-shadow:
-    0 15px 35px rgba(94, 71, 145, 0.08);
+    padding: 28px 27px;
 
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    box-shadow:
+        0 15px 35px rgba(94, 71, 145, 0.08);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .compliment-card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-5px);
 
-  box-shadow:
-    0 20px 45px rgba(94, 71, 145, 0.13);
+    box-shadow:
+        0 20px 45px rgba(94, 71, 145, 0.13);
 }
 
 
-/* =========================
+/* =====================================================
    CARD TOP
-========================= */
+===================================================== */
 
 .card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
 }
 
 .featured-label {
-  color: #ff6da8;
+    color: #ff6da8;
 
-  font-size: 12px;
+    font-size: 12px;
 
-  font-weight: 700;
+    font-weight: 700;
 
-  letter-spacing: 2px;
+    letter-spacing: 2px;
 
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 .anonymous {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+    display: flex;
 
-  color: #3d385d;
+    align-items: center;
 
-  font-size: 18px;
+    gap: 7px;
 
-  font-weight: 600;
+    color: #3d385d;
+
+    font-size: 18px;
+
+    font-weight: 600;
 }
 
 .card-emoji {
-  font-size: 22px;
+    font-size: 22px;
 }
 
 
-/* =========================
+/* =====================================================
    TO
-========================= */
+===================================================== */
 
 .card-to {
-  margin-top: 17px;
+    margin-top: 17px;
 
-  color: #777096;
+    color: #777096;
 
-  font-size: 13px;
+    font-size: 13px;
 
-  font-weight: 600;
+    font-weight: 600;
 }
 
 
-/* =========================
+/* =====================================================
    MESSAGE
-========================= */
+===================================================== */
 
 .card-message {
-  margin: 13px 0 22px;
+    margin: 13px 0 22px;
 
-  color: #625b79;
+    color: #625b79;
 
-  font-size: 20px;
+    font-size: 20px;
 
-  line-height: 1.55;
+    line-height: 1.55;
 }
 
 
-/* =========================
+/* =====================================================
    TIME
-========================= */
+===================================================== */
 
 .card-time {
-  color: #9188ad;
+    color: #9188ad;
 
-  font-size: 13px;
+    font-size: 13px;
 
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 
-/* =========================
-   REACTIONS
-========================= */
+/* =====================================================
+   REACTION ROW
+===================================================== */
 
 .reaction-row {
-  display: flex;
+    display: flex;
 
-  align-items: center;
+    align-items: center;
 
-  gap: 8px;
+    gap: 8px;
+
+    position: relative;
+
+    overflow: visible;
 }
+
+
+/* =====================================================
+   REACTION BUTTON
+===================================================== */
 
 .reaction-btn {
-  display: flex;
+    position: relative;
 
-  align-items: center;
+    display: flex;
 
-  gap: 7px;
+    align-items: center;
 
-  padding: 9px 16px;
+    justify-content: center;
 
-  border: 1px solid #ebe4ff;
+    gap: 9px;
 
-  background: white;
+    min-width: 82px;
 
-  border-radius: 30px;
+    height: 42px;
 
-  color: #514b6d;
+    padding: 0 16px;
 
-  font-size: 14px;
+    border: 1px solid #e7ddff;
 
-  cursor: pointer;
+    border-radius: 30px;
 
-  transition: 0.25s;
+    background: white;
+
+    color: #4d4668;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+    overflow: visible;
 }
+
+
+/* =====================================================
+   REACTION HOVER
+===================================================== */
 
 .reaction-btn:hover {
-  background: #fff2fa;
+    transform: translateY(-3px);
 
-  transform: translateY(-2px);
-}
+    border-color: #d8c8ff;
 
-.report-btn {
-  margin-left: auto;
-
-  border: none;
-
-  background: transparent;
-
-  color: #9188ad;
-
-  cursor: pointer;
-
-  font-size: 13px;
+    box-shadow:
+        0 8px 18px rgba(123, 97, 255, 0.12);
 }
 
 
-/* =========================
+/* =====================================================
+   REACTION EMOJI
+===================================================== */
+
+.reaction-emoji {
+    display: inline-block;
+
+    font-size: 17px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+.reaction-btn:hover .reaction-emoji {
+    transform: scale(1.15);
+}
+
+
+/* =====================================================
+   REACTION COUNT
+===================================================== */
+
+.reaction-count {
+    line-height: 1;
+}
+
+
+/* =====================================================
+   SELECTED REACTION
+===================================================== */
+
+.reaction-selected {
+    background: #fff1f8;
+
+    border-color: #ffb5d5;
+
+    box-shadow:
+        0 5px 15px rgba(255, 90, 167, 0.12);
+}
+
+.reaction-selected .reaction-emoji {
+    transform: scale(1.15);
+}
+
+
+/* =====================================================
+   FLOATING REACTION BURST
+===================================================== */
+
+.reaction-burst {
+    position: absolute;
+
+    left: 0;
+
+    bottom: 15px;
+
+    width: 100%;
+
+    height: 1px;
+
+    pointer-events: none;
+
+    z-index: 100;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   INDIVIDUAL FLOATING EMOJIS
+===================================================== */
+
+.burst-particle {
+    position: absolute;
+
+    left: var(--particle-left);
+
+    bottom: 0;
+
+    font-size: 18px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    animation:
+        floatReaction
+        var(--particle-duration)
+        ease-out
+        var(--particle-delay)
+        forwards;
+
+    filter:
+        drop-shadow(
+            0 3px 4px
+            rgba(255, 90, 167, 0.15)
+        );
+}
+
+
+/* =====================================================
+   FLOAT UP ANIMATION
+===================================================== */
+
+@keyframes floatReaction {
+
+    0% {
+        opacity: 0;
+
+        transform:
+            translate(
+                0,
+                0
+            )
+            scale(0.5)
+            rotate(0deg);
+    }
+
+    15% {
+        opacity: 1;
+
+        transform:
+            translate(
+                0,
+                -15px
+            )
+            scale(1);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+            translate(
+                0,
+                calc(
+                    var(--particle-distance) * -0.55
+                )
+            )
+            scale(1.1)
+            rotate(
+                var(--particle-rotate)
+            );
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translate(
+                0,
+                calc(
+                    var(--particle-distance) * -1
+                )
+            )
+            scale(0.75)
+            rotate(
+                var(--particle-rotate)
+            );
+    }
+}
+
+
+/* =====================================================
    DIVIDER
-========================= */
+===================================================== */
 
 .card-divider {
-  margin: 16px 0;
+    margin: 16px 0;
 
-  border-top: 1px dashed #e7def7;
+    border-top:
+        1px dashed #e7def7;
 }
 
 
-/* =========================
+/* =====================================================
    REPLY
-========================= */
+===================================================== */
 
 .reply-toggle {
-  border: none;
+    border: none;
 
-  background: transparent;
+    background: transparent;
 
-  padding: 0;
+    padding: 0;
 
-  color: #766b9a;
+    color: #766b9a;
 
-  font-size: 14px;
+    font-size: 14px;
 
-  font-weight: 600;
+    font-weight: 600;
 
-  cursor: pointer;
+    cursor: pointer;
+}
+
+.reply-toggle:hover {
+    color: #8b5cf6;
 }
 
 
-/* =========================
+/* =====================================================
    REPLY BOX
-========================= */
+===================================================== */
 
 .reply-box {
-  display: flex;
+    display: flex;
 
-  gap: 9px;
+    gap: 9px;
 
-  margin-top: 16px;
+    margin-top: 16px;
 }
 
 .reply-box input {
-  min-width: 0;
+    min-width: 0;
 
-  flex: 1;
+    flex: 1;
 
-  border: 1px solid #e7def7;
+    border:
+        1px solid #e7def7;
 
-  border-radius: 18px;
+    border-radius: 18px;
 
-  padding: 13px 17px;
+    padding: 13px 17px;
 
-  outline: none;
+    outline: none;
 
-  font-size: 13px;
+    font-size: 13px;
 }
 
 .reply-box input:focus {
-  border-color: #c8a7ff;
+    border-color: #c8a7ff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139, 92, 246, 0.08);
 }
+
+
+/* =====================================================
+   SEND
+===================================================== */
 
 .send-btn {
-  border: none;
+    border: none;
 
-  border-radius: 22px;
+    border-radius: 22px;
 
-  padding: 0 19px;
+    padding: 0 19px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #f29ac8,
-      #a777ed
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #f29ac8,
+            #a777ed
+        );
 
-  color: white;
+    color: white;
 
-  font-weight: 600;
+    font-weight: 600;
 
-  cursor: pointer;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px
+        rgba(139, 92, 246, 0.2);
 }
 
 
-/* =========================
-   WHOLE WALL BUTTON
-========================= */
+/* =====================================================
+   WHOLE WALL
+===================================================== */
 
 .whole-wall {
-  display: flex;
+    display: flex;
 
-  justify-content: center;
+    justify-content: center;
 
-  margin-top: 32px;
+    margin-top: 32px;
 }
 
 .whole-wall-btn {
-  padding: 15px 28px;
+    padding: 15px 28px;
 
-  border: 1px solid #e6ddfa;
+    border:
+        1px solid #e6ddfa;
 
-  border-radius: 30px;
+    border-radius: 30px;
 
-  background: white;
+    background: white;
 
-  color: #4a4368;
+    color: #4a4368;
 
-  font-size: 16px;
+    font-size: 16px;
 
-  font-weight: 600;
+    font-weight: 600;
 
-  cursor: pointer;
+    cursor: pointer;
 
-  transition: 0.3s;
+    transition: 0.3s;
 }
 
 .whole-wall-btn:hover {
-  transform: translateY(-3px);
+    transform: translateY(-3px);
 
-  box-shadow:
-    0 10px 25px rgba(100, 80, 150, 0.1);
+    box-shadow:
+        0 10px 25px
+        rgba(100, 80, 150, 0.1);
 }
 
 
-/* =========================
+/* =====================================================
    KINDNESS PROFILE
-========================= */
+===================================================== */
 
 .kindness-profile {
-  max-width: 1220px;
+    max-width: 1220px;
 
-  margin: 45px auto 0;
+    margin: 45px auto 0;
 
-  display: flex;
+    display: flex;
 
-  justify-content: space-between;
+    justify-content: space-between;
 
-  align-items: flex-end;
+    align-items: flex-end;
 }
 
 .kindness-profile h2 {
-  margin: 0;
+    margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  color: #38345a;
+    color: #38345a;
 
-  font-size: 34px;
+    font-size: 34px;
 }
 
 .kindness-profile p {
-  margin-top: 7px;
+    margin-top: 7px;
 
-  color: #9188ad;
+    color: #9188ad;
 
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .profile-btn {
-  padding: 13px 22px;
+    padding: 13px 22px;
 
-  border: 1px solid #e7def7;
+    border:
+        1px solid #e7def7;
 
-  border-radius: 30px;
+    border-radius: 30px;
 
-  background: white;
+    background: white;
 
-  color: #625b79;
+    color: #625b79;
 
-  font-weight: 600;
+    font-weight: 600;
 
-  cursor: pointer;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.profile-btn:hover {
+    transform: translateY(-2px);
 }
 
 
-/* =========================
+/* =====================================================
    FIXED SHARE BUTTON
-========================= */
+===================================================== */
 
 .wall-share-btn {
-  position: fixed;
+    position: fixed;
 
-  right: 28px;
+    right: 28px;
 
-  bottom: 25px;
+    bottom: 25px;
 
-  z-index: 1000;
+    z-index: 1000;
 
-  padding: 16px 27px;
+    padding: 16px 27px;
 
-  border: none;
+    border: none;
 
-  border-radius: 40px;
+    border-radius: 40px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #f15eaa,
-      #9158e8
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #f15eaa,
+            #9158e8
+        );
 
-  color: white;
+    color: white;
 
-  font-size: 15px;
+    font-size: 15px;
 
-  font-weight: 700;
+    font-weight: 700;
 
-  cursor: pointer;
+    cursor: pointer;
 
-  box-shadow:
-    0 12px 30px rgba(123, 97, 255, 0.28);
+    box-shadow:
+        0 12px 30px
+        rgba(123, 97, 255, 0.28);
 
-  transition: 0.3s;
+    transition: 0.3s;
 }
 
 .wall-share-btn:hover {
-  transform: translateY(-4px);
+    transform: translateY(-4px);
 
-  box-shadow:
-    0 17px 35px rgba(123, 97, 255, 0.35);
+    box-shadow:
+        0 17px 35px
+        rgba(123, 97, 255, 0.35);
 }
 
 
-/* =========================
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media (max-width: 1000px) {
 
-  .wall-header,
-  .compliment-grid,
-  .kindness-profile {
-    margin-left: 30px;
-    margin-right: 30px;
-  }
+    .wall-header,
+    .compliment-grid,
+    .kindness-profile {
+        margin-left: 30px;
 
-  .compliment-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+        margin-right: 30px;
+    }
 
+    .compliment-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
 }
+
 
 @media (max-width: 650px) {
 
-  .wall-header,
-  .compliment-grid,
-  .kindness-profile {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
+    .wall-header,
+    .compliment-grid,
+    .kindness-profile {
+        margin-left: 20px;
 
-  .compliment-grid {
-    grid-template-columns: 1fr;
-  }
+        margin-right: 20px;
+    }
 
-  .kindness-profile {
-    flex-direction: column;
+    .compliment-grid {
+        grid-template-columns: 1fr;
+    }
 
-    align-items: flex-start;
+    .kindness-profile {
+        flex-direction: column;
 
-    gap: 20px;
-  }
+        align-items: flex-start;
 
-  .reaction-row {
-    flex-wrap: wrap;
-  }
+        gap: 20px;
+    }
 
+    .reaction-row {
+        flex-wrap: wrap;
+    }
+
+    .wall-share-btn {
+        right: 15px;
+
+        bottom: 15px;
+
+        padding:
+            14px 20px;
+
+        font-size: 14px;
+    }
+}
+/* =========================
+   REPORT BUTTON
+========================= */
+
+.report-btn {
+    margin-left: auto;
+
+    border: none !important;
+
+    background: transparent !important;
+
+    color: #9188ad !important;
+
+    padding: 0 !important;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: color 0.25s ease, transform 0.25s ease;
+
+    box-shadow: none !important;
+}
+
+.report-btn:hover {
+    color: #ff6da8 !important;
+
+    transform: translateY(-1px);
+
+    background: transparent !important;
 }

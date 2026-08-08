@@ -194,21 +194,16 @@ body {
 .hero {
     position: relative;
 
-    min-height: calc(100vh - 90px);
+    min-height: auto;
 
     display: flex;
-
     align-items: flex-start;
-
     justify-content: space-between;
 
-    padding: 5px 0 80px 13.5%;
-
-    
+    padding: 5px 0 35px 13.5%;
 
     overflow: hidden;
 }
-
 
 /* =====================================================
    LEFT SIDE
@@ -885,4 +880,55 @@ body {
 
     }
 
+}
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footer {
+    width: 100%;
+
+    margin-top: 55px;
+
+    padding: 45px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #fffaff,
+        #f8f5ff
+    );
+
+    border-top: 1px solid #eee7ff;
+}
+
+.footer-content {
+    max-width: 1220px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+.footer-content h3 {
+    margin: 0 0 10px;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 22px;
+
+    color: #38345a;
+}
+
+.footer-content p {
+    margin: 0 0 12px;
+
+    color: #81789f;
+
+    font-size: 16px;
+}
+
+.footer-content span {
+    color: #aaa1bd;
+
+    font-size: 13px;
 }

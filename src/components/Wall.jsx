@@ -1,5 +1,6 @@
 import React, { useState } from "react";
- 
+import ReactionButton from "./ReactionButton";
+
 const compliments = [
   {
     featured: true,
@@ -10,6 +11,7 @@ const compliments = [
     counts: [28, 16, 4],
     emoji: "🌞",
   },
+
   {
     to: "LIBRARY STAFF",
     message:
@@ -18,8 +20,8 @@ const compliments = [
     reactions: ["❤️", "😊", "👏"],
     counts: [19, 12, 1],
     emoji: "😊",
-    replyOpen: true,
   },
+
   {
     to: "PROF. FROM SEM 3 MATHS",
     message:
@@ -29,6 +31,7 @@ const compliments = [
     counts: [63, 22, 9],
     emoji: "👏",
   },
+
   {
     to: "A STRANGER IN THE CORRIDOR",
     message:
@@ -38,17 +41,21 @@ const compliments = [
     counts: [54, 31, 2],
     emoji: "💙",
   },
+
   {
     to: "WHOEVER FOUND MY WALLET",
-    message: "To whoever returned my lost wallet, you're amazing.",
+    message:
+      "To whoever returned my lost wallet, you're amazing.",
     time: "12h ago",
     reactions: ["❤️", "😊", "👏"],
     counts: [87, 40, 6],
     emoji: "😊",
   },
+
   {
     to: "DRAMA CLUB",
-    message: "Your last play made me cry in the best way. Please never stop.",
+    message:
+      "Your last play made me cry in the best way. Please never stop.",
     time: "1d ago",
     reactions: ["❤️", "😊", "👏"],
     counts: [31, 18, 5],
@@ -58,29 +65,86 @@ const compliments = [
 
 const Wall = () => {
   const [openReply, setOpenReply] = useState(1);
+
   const [replyText, setReplyText] = useState("");
 
-  return (
-  <>
+  // Which reactions the current user clicked
+  const [userReactions, setUserReactions] = useState({});
 
+  // Reaction counts for every card
+  const [reactionCounts, setReactionCounts] = useState(
+    compliments.map((item) => [...item.counts])
+  );
+
+  const handleReaction = (cardIndex, reactionIndex) => {
+    const reactionKey = `${cardIndex}-${reactionIndex}`;
+
+    const alreadyReacted =
+      userReactions[reactionKey] === true;
+
+    // Toggle selected state
+    setUserReactions((previous) => ({
+      ...previous,
+      [reactionKey]: !alreadyReacted,
+    }));
+
+    // Update count
+    setReactionCounts((previous) =>
+      previous.map((cardCounts, index) => {
+        if (index !== cardIndex) {
+          return cardCounts;
+        }
+
+        return cardCounts.map((count, rIndex) => {
+          if (rIndex !== reactionIndex) {
+            return count;
+          }
+
+          return alreadyReacted
+            ? count - 1
+            : count + 1;
+        });
+      })
+    );
+  };
+
+  return (
     <div className="wall-page">
 
-      {/* PAGE HEADER */}
+      {/* =========================
+          PAGE HEADER
+      ========================= */}
+
       <section className="wall-header">
         <h1>Recent compliments</h1>
-        <p>A glimpse of kindness happening right now.</p>
+
+        <p>
+          A glimpse of kindness happening right now.
+        </p>
       </section>
 
-      {/* COMPLIMENT GRID */}
+
+      {/* =========================
+          COMPLIMENT GRID
+      ========================= */}
+
       <section className="compliment-grid">
 
         {compliments.map((item, index) => (
-          <article className="compliment-card" key={index}>
 
-            {/* TOP */}
+          <article
+            className="compliment-card"
+            key={index}
+          >
+
+            {/* =========================
+                CARD TOP
+            ========================= */}
+
             <div className="card-top">
 
               <div>
+
                 {item.featured && (
                   <div className="featured-label">
                     ⭐ FEATURED
@@ -90,6 +154,7 @@ const Wall = () => {
                 <div className="anonymous">
                   💙 <span>Anonymous</span>
                 </div>
+
               </div>
 
               <span className="card-emoji">
@@ -98,33 +163,69 @@ const Wall = () => {
 
             </div>
 
-            {/* TO */}
+
+            {/* =========================
+                TO
+            ========================= */}
+
             <div className="card-to">
               TO: {item.to}
             </div>
 
-            {/* MESSAGE */}
+
+            {/* =========================
+                MESSAGE
+            ========================= */}
+
             <p className="card-message">
               “{item.message}”
             </p>
 
-            {/* TIME */}
+
+            {/* =========================
+                TIME
+            ========================= */}
+
             <div className="card-time">
               {item.time}
             </div>
 
-            {/* REACTIONS */}
+
+            {/* =========================
+                REACTIONS
+            ========================= */}
+
             <div className="reaction-row">
 
-              {item.reactions.map((reaction, reactionIndex) => (
-                <button
-                className="reaction-btn"
-                key={reactionIndex}
-                >
-                  <span>{reaction}</span>
-                  <span>{item.counts[reactionIndex]}</span>
-                </button>
-              ))}
+              {item.reactions.map(
+                (reaction, reactionIndex) => {
+
+                  const reactionKey =
+                    `${index}-${reactionIndex}`;
+
+                  const isSelected =
+                    userReactions[reactionKey] === true;
+
+                  return (
+                    <ReactionButton
+                      key={reactionIndex}
+                      emoji={reaction}
+                      count={
+                        reactionCounts[index][
+                          reactionIndex
+                        ]
+                      }
+                      selected={isSelected}
+                      onClick={() =>
+                        handleReaction(
+                          index,
+                          reactionIndex
+                        )
+                      }
+                    />
+                  );
+                }
+              )}
 
               <button className="report-btn">
                 Report
@@ -132,23 +233,39 @@ const Wall = () => {
 
             </div>
 
-            {/* DIVIDER */}
+
+            {/* =========================
+                DIVIDER
+            ========================= */}
+
             <div className="card-divider"></div>
 
-            {/* REPLY */}
+
+            {/* =========================
+                REPLY
+            ========================= */}
+
             <button
               className="reply-toggle"
               onClick={() =>
                 setOpenReply(
-                  openReply === index ? null : index
+                  openReply === index
+                    ? null
+                    : index
                 )
               }
             >
               💬 Reply anonymously{" "}
-              {openReply === index ? "▲" : "▼"}
+              {openReply === index
+                ? "▲"
+                : "▼"}
             </button>
 
-            {/* REPLY BOX */}
+
+            {/* =========================
+                REPLY BOX
+            ========================= */}
+
             {openReply === index && (
               <div className="reply-box">
 
@@ -169,26 +286,37 @@ const Wall = () => {
             )}
 
           </article>
+
         ))}
 
       </section>
 
-      {/* SEE WHOLE WALL */}
+
+      {/* =========================
+          WHOLE WALL
+      ========================= */}
+
       <div className="whole-wall">
+
         <button className="whole-wall-btn">
           See the whole wall →
         </button>
+
       </div>
+
 
       
 
-      {/* FIXED SHARE BUTTON */}
+
+      {/* =========================
+          FIXED SHARE BUTTON
+      ========================= */}
+
       <button className="wall-share-btn">
         ＋ Share Kindness
       </button>
 
     </div>
-        </>
   );
 };
 
