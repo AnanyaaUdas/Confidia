@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactionButton from "./ReactionButton";
 
 const ComplimentCard = ({
@@ -12,6 +12,14 @@ const ComplimentCard = ({
     userReactions,
     handleReaction
 }) => {
+
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reported, setReported] = useState(false);
+
+    const confirmReport = () => {
+        setReported(true);
+        setShowReportModal(false);
+    };
 
     return (
         <article className="compliment-card">
@@ -51,7 +59,7 @@ const ComplimentCard = ({
             {/* MESSAGE */}
 
             <p className="card-message">
-                “{item.message}”
+                "{item.message}"
             </p>
 
 
@@ -78,18 +86,14 @@ const ComplimentCard = ({
                         return (
                             <ReactionButton
                                 key={reactionIndex}
-
-                                reaction={reaction}
-
+                                emoji={reaction}
                                 count={
                                     reactionCounts[index][
                                         reactionIndex
                                     ]
                                 }
-
                                 selected={isSelected}
-
-                                onReact={() =>
+                                onClick={() =>
                                     handleReaction(
                                         index,
                                         reactionIndex
@@ -101,8 +105,12 @@ const ComplimentCard = ({
                     }
                 )}
 
-                <button className="report-btn">
-                    Report
+                <button
+                    className="report-btn"
+                    onClick={() => setShowReportModal(true)}
+                    disabled={reported}
+                >
+                    {reported ? "Reported" : "Report"}
                 </button>
 
             </div>
@@ -156,6 +164,58 @@ const ComplimentCard = ({
                     <button className="send-btn">
                         Send
                     </button>
+
+                </div>
+
+            )}
+
+
+            {/* REPORT MODAL */}
+
+            {showReportModal && (
+
+                <div
+                    className="report-overlay"
+                    onClick={() => setShowReportModal(false)}
+                >
+
+                    <div
+                        className="report-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+
+                        <div className="report-icon">
+                            🚩
+                        </div>
+
+                        <h3>
+                            Report this compliment?
+                        </h3>
+
+                        <p>
+                            This will flag the post for review.
+                            You're helping keep the wall kind and safe.
+                        </p>
+
+                        <div className="report-actions">
+
+                            <button
+                                className="report-cancel"
+                                onClick={() => setShowReportModal(false)}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className="report-confirm"
+                                onClick={confirmReport}
+                            >
+                                Yes, Report
+                            </button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import ReactionButton from "./ReactionButton";
+import ComplimentCard from "./ComplimentCard";
+import Profile from "./Profile";
 
 const compliments = [
   {
@@ -126,167 +127,24 @@ const Wall = () => {
 
       {/* =========================
           COMPLIMENT GRID
+          (now using the shared ComplimentCard component)
       ========================= */}
 
       <section className="compliment-grid">
 
         {compliments.map((item, index) => (
-
-          <article
-            className="compliment-card"
+          <ComplimentCard
             key={index}
-          >
-
-            {/* =========================
-                CARD TOP
-            ========================= */}
-
-            <div className="card-top">
-
-              <div>
-
-                {item.featured && (
-                  <div className="featured-label">
-                    ⭐ FEATURED
-                  </div>
-                )}
-
-                <div className="anonymous">
-                  💙 <span>Anonymous</span>
-                </div>
-
-              </div>
-
-              <span className="card-emoji">
-                {item.emoji}
-              </span>
-
-            </div>
-
-
-            {/* =========================
-                TO
-            ========================= */}
-
-            <div className="card-to">
-              TO: {item.to}
-            </div>
-
-
-            {/* =========================
-                MESSAGE
-            ========================= */}
-
-            <p className="card-message">
-              “{item.message}”
-            </p>
-
-
-            {/* =========================
-                TIME
-            ========================= */}
-
-            <div className="card-time">
-              {item.time}
-            </div>
-
-
-            {/* =========================
-                REACTIONS
-            ========================= */}
-
-            <div className="reaction-row">
-
-              {item.reactions.map(
-                (reaction, reactionIndex) => {
-
-                  const reactionKey =
-                    `${index}-${reactionIndex}`;
-
-                  const isSelected =
-                    userReactions[reactionKey] === true;
-
-                  return (
-                    <ReactionButton
-                      key={reactionIndex}
-                      emoji={reaction}
-                      count={
-                        reactionCounts[index][
-                          reactionIndex
-                        ]
-                      }
-                      selected={isSelected}
-                      onClick={() =>
-                        handleReaction(
-                          index,
-                          reactionIndex
-                        )
-                      }
-                    />
-                  );
-                }
-              )}
-
-              <button className="report-btn">
-                Report
-              </button>
-
-            </div>
-
-
-            {/* =========================
-                DIVIDER
-            ========================= */}
-
-            <div className="card-divider"></div>
-
-
-            {/* =========================
-                REPLY
-            ========================= */}
-
-            <button
-              className="reply-toggle"
-              onClick={() =>
-                setOpenReply(
-                  openReply === index
-                    ? null
-                    : index
-                )
-              }
-            >
-              💬 Reply anonymously{" "}
-              {openReply === index
-                ? "▲"
-                : "▼"}
-            </button>
-
-
-            {/* =========================
-                REPLY BOX
-            ========================= */}
-
-            {openReply === index && (
-              <div className="reply-box">
-
-                <input
-                  type="text"
-                  placeholder="Write an anonymous reply..."
-                  value={replyText}
-                  onChange={(e) =>
-                    setReplyText(e.target.value)
-                  }
-                />
-
-                <button className="send-btn">
-                  Send
-                </button>
-
-              </div>
-            )}
-
-          </article>
-
+            item={item}
+            index={index}
+            openReply={openReply}
+            setOpenReply={setOpenReply}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            reactionCounts={reactionCounts}
+            userReactions={userReactions}
+            handleReaction={handleReaction}
+          />
         ))}
 
       </section>
@@ -305,8 +163,11 @@ const Wall = () => {
       </div>
 
 
-      
+      {/* =========================
+          KINDNESS PROFILE
+      ========================= */}
 
+     
 
       {/* =========================
           FIXED SHARE BUTTON

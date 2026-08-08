@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import logo from "../assets/Images/logo.png";
+import NotificationBell from "./NotificationBell";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,12 +29,15 @@ const NavBar = () => {
             <Link to="/badges">Badges</Link>
           </li>
         </ul>
+         <div className="nav-actions">
+
+        <NotificationBell />
 
         <div className="loginDropDown">
           <button
             className="login-btn"
             onClick={() => setIsOpen(!isOpen)}
-          >
+            >
             Login
           </button>
 
@@ -43,6 +47,7 @@ const NavBar = () => {
               <Link to="/admin-login">Admin Login</Link>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
