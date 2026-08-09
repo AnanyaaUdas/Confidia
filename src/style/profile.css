@@ -236,3 +236,243 @@
     }
 
 }
+
+/* =====================================================
+   PROFILE PAGE WRAPPER
+===================================================== */
+
+.profile-page {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 60px 20px 80px;
+}
+
+
+/* DEV TOGGLE — remove once real auth exists */
+
+.dev-toggle {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    z-index: 999;
+
+    padding: 8px 16px;
+
+    border-radius: 20px;
+    border: 1px dashed #cdbaff;
+
+    background: white;
+
+    color: #7b61ff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   WELCOME CARD (shown when logged in)
+===================================================== */
+
+.welcome-card {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+
+    padding: 30px 34px;
+
+    background: linear-gradient(135deg, #fff7fb, #f6f1ff);
+
+    border: 1px solid #f0e6ff;
+
+    border-radius: 30px;
+
+    box-shadow: 0 20px 45px rgba(94, 71, 145, 0.10);
+
+    margin-bottom: 40px;
+
+    animation: fadeSlideIn 0.35s ease;
+}
+
+.welcome-avatar {
+    width: 68px;
+    height: 68px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #ff6fa5, #8b5cf6);
+
+    color: white;
+
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.30);
+}
+
+.welcome-info {
+    flex: 1;
+}
+
+.welcome-info h3 {
+    margin: 0;
+
+    font-family: Georgia, serif;
+    font-size: 22px;
+
+    color: #38345a;
+}
+
+.welcome-since {
+    display: block;
+    margin-top: 4px;
+
+    color: #a79dc7;
+    font-size: 13.5px;
+}
+
+.welcome-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 18px;
+}
+
+.welcome-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-stat strong {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    color: #38345a;
+}
+
+.welcome-stat span {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: #9a90b5;
+}
+
+.welcome-edit {
+    padding: 11px 22px;
+
+    border-radius: 30px;
+    border: 1px solid #e7def7;
+
+    background: white;
+
+    color: #625b79;
+
+    font-size: 13.5px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    flex-shrink: 0;
+}
+
+.welcome-edit:hover {
+    border-color: #cdbaff;
+    color: #7b61ff;
+    transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   KINDNESS CLOUD
+===================================================== */
+
+.kindness-cloud {
+    margin-top: 45px;
+
+    padding: 40px 45px;
+
+    background: white;
+
+    border-radius: 28px;
+
+    border: 1px solid #f1ecfb;
+
+    box-shadow: 0 15px 35px rgba(94, 71, 145, 0.06);
+}
+
+.cloud-label {
+    color: #a79dc7;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    margin-bottom: 22px;
+}
+
+.cloud-words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 20px 28px;
+}
+
+.cloud-word {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+}
+
+.cloud-sm { font-size: 18px; }
+.cloud-md { font-size: 24px; }
+.cloud-lg { font-size: 32px; }
+.cloud-xl { font-size: 44px; }
+
+.cloud-pink { color: #ff5da8; }
+.cloud-purple { color: #7b61ff; }
+.cloud-dark { color: #3a3556; }
+.cloud-gray { color: #a79dc7; font-weight: 500; }
+
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 650px) {
+
+    .welcome-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .welcome-stats {
+        justify-content: center;
+    }
+
+    .kindness-cloud {
+        padding: 30px 24px;
+    }
+}

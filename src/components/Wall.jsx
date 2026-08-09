@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ComplimentCard from "./ComplimentCard";
-import Profile from "./Profile";
+import Profile from "./ProfilePage";
 
 const compliments = [
   {

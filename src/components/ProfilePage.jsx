@@ -1,5 +1,6 @@
 import React from "react";
 import BadgeCard from "./BadgeCard";
+import { Link } from "react-router-dom";
 
 
 const badges = [
@@ -33,7 +34,7 @@ const badges = [
     },
 ];
 
-const Profile = () => {
+const ProfilePage = () => {
 
     return (
         <section className="kindness-profile">
@@ -49,9 +50,9 @@ const Profile = () => {
                     </p>
                 </div>
 
-                <button className="profile-btn">
+                 <Link to="/profile" className="profile-btn">
                     View full profile →
-                </button>
+                </Link>
 
             </div>
 
@@ -75,4 +76,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfilePage;

@@ -8,7 +8,8 @@ import "./style/Notification.css"
 import Home from "./pages/Home";
 import Wall from "./pages/Wall";
 import Write from "./pages/Write";
-import Badges from "./pages/Badges";
+import Profile from "./pages/Profile";
+
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/wall" element={<Wall />} />
         <Route path="/write" element={<Write />} />
-        <Route path="/badges" element={<Badges />} />
+        <Route path="/Profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
     </>
