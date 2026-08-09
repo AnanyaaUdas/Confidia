@@ -1,40 +1,12 @@
 import React from "react";
 import BadgeCard from "./BadgeCard";
 import { Link } from "react-router-dom";
+import useAppStore from "../store/useAppStore";
 
 
-const badges = [
-    {
-        emoji: "💌",
-        title: "First Compliment",
-        description: "Break the ice.",
-        progress: "0/1",
-        unlocked: false,
-    },
-    {
-        emoji: "🌸",
-        title: "Spread Happiness",
-        description: "10 compliments.",
-        progress: "0/10",
-        unlocked: false,
-    },
-    {
-        emoji: "⭐",
-        title: "Campus Hero",
-        description: "100 reactions.",
-        progress: "0/100",
-        unlocked: false,
-    },
-    {
-        emoji: "🔥",
-        title: "Kindness Streak",
-        description: "5 days in a row.",
-        progress: "1/5",
-        unlocked: false,
-    },
-];
 
 const ProfilePage = () => {
+    const badges = useAppStore((state) => state.badges)
 
     return (
         <section className="kindness-profile">
