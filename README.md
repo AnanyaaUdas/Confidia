@@ -45,8 +45,6 @@ The goal of Confidia is to create a safe and positive digital space where studen
 
 ## 🛠️ Tech Stack
 
-## 🛠️ Tech Stack
-
 ### Frontend
 
 - React
