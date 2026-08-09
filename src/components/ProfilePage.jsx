@@ -3,49 +3,83 @@ import BadgeCard from "./BadgeCard";
 import { Link } from "react-router-dom";
 import useAppStore from "../store/useAppStore";
 
-
-
 const ProfilePage = () => {
-    const badges = useAppStore((state) => state.badges)
+  const User = useAppStore((state) => state.User);
+  const badges = useAppStore((state) => state.badges);
 
-    return (
-        <section className="kindness-profile">
+  const calculatedBadges = badges.map((badge) => {
+    if (badge.title === "First Compliment") {
+      return {
+        ...badge,
+        progress: `${Math.min(User.complimentsShared, 1)}/1`,
+        unlocked: User.complimentsShared >= 1,
+      };
+    }
 
-            <div className="profile-heading">
+    if (badge.title === "Spread Happiness") {
+      return {
+        ...badge,
+        progress: `${Math.min(User.complimentsShared, 10)}/10`,
+        unlocked: User.complimentsShared >= 10,
+      };
+    }
 
-                <div>
-                    <h2>Your kindness profile</h2>
+    if (badge.title === "Campus Hero") {
+      return {
+        ...badge,
+        progress: `${Math.min(User.reactionsGiven, 100)}/100`,
+        unlocked: User.reactionsGiven >= 100,
+      };
+    }
 
-                    <p>
-                        No login needed — just your anonymous badges,
-                        right here.
-                    </p>
-                </div>
+    if (badge.title === "Kindness Streak") {
+      return {
+        ...badge,
+        progress: `${Math.min(User.dayStreak, 5)}/5`,
+        unlocked: User.dayStreak >= 5,
+      };
+    }
 
-                 <Link to="/profile" className="profile-btn">
-                    View full profile →
-                </Link>
+    return badge;
+  });
 
-            </div>
+  return (
+    <section className="kindness-profile">
 
+      <div className="profile-heading">
 
-            <div className="badge-grid">
+        <div>
+          <h2>Your kindness profile</h2>
 
-                {badges.map((badge, index) => (
-                    <BadgeCard
-                        key={index}
-                        emoji={badge.emoji}
-                        title={badge.title}
-                        description={badge.description}
-                        progress={badge.progress}
-                        unlocked={badge.unlocked}
-                    />
-                ))}
+          <p>
+            No login needed — just your anonymous badges,
+            right here.
+          </p>
+        </div>
 
-            </div>
+        <Link to="/profile" className="profile-btn">
+          View full profile →
+        </Link>
 
-        </section>
-    );
+      </div>
+
+      <div className="badge-grid">
+
+        {calculatedBadges.map((badge, index) => (
+          <BadgeCard
+            key={index}
+            emoji={badge.emoji}
+            title={badge.title}
+            description={badge.description}
+            progress={badge.progress}
+            unlocked={badge.unlocked}
+          />
+        ))}
+
+      </div>
+
+    </section>
+  );
 };
 
 export default ProfilePage;
