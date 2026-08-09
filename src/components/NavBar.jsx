@@ -26,7 +26,7 @@ const NavBar = () => {
           </li>
 
           <li>
-            <Link to="/badges">Badges</Link>
+            <Link to="/Profile">Badges</Link>
           </li>
         </ul>
          <div className="nav-actions">

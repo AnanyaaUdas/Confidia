@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar";
 import Hero from "../components/Hero";
 import Stats from "../components/Stats"
 import Wall from "../components/Wall";
-import Profile from "../components/Profile";
+import ProfilePage from "../components/ProfilePage";
 import Footer from "../components/Footer";
 
 const Home = () => {
@@ -15,7 +15,7 @@ const Home = () => {
         <Hero />
         <Stats />
         <Wall />
-        <Profile />
+        <ProfilePage />
       
         
       </div>
