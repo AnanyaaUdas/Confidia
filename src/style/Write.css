@@ -1,0 +1,380 @@
+.write-page {
+  min-height: 100vh;
+  padding: 50px 7%;
+  background-color: #fffafd;
+}
+
+/* Intro */
+
+.write-intro {
+  max-width: 1250px;
+  margin: 0 auto 40px;
+}
+
+.write-intro h1 {
+  margin: 0 0 10px;
+  color: #3d365c;
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.write-intro p {
+  margin: 0;
+  color: #817a99;
+  font-size: 16px;
+}
+
+
+/* Main layout */
+
+.write-layout {
+  max-width: 1250px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+
+  align-items: start;
+}
+
+
+/* Left side */
+
+.write-left {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+
+/* Kindness prompt */
+
+.kindness-prompt {
+  padding: 35px;
+
+  background-color: #fff8e9;
+  border: 1px solid #f1e5cc;
+  border-radius: 25px;
+
+  box-shadow: 0 8px 25px rgba(80, 65, 120, 0.07);
+}
+
+.kindness-prompt p {
+  margin: 0 0 20px;
+
+  color: #756b8d;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.kindness-prompt h2 {
+  margin: 0 0 25px;
+
+  color: #403957;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+
+/* Spin button */
+
+.wheel-button {
+  padding: 12px 20px;
+
+  border: 1px solid #ddd3f1;
+  border-radius: 25px;
+
+  background-color: white;
+  color: #514968;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.wheel-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 6px 15px rgba(80, 65, 120, 0.12);
+}
+
+
+/* Information cards */
+
+.info-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.info-card {
+  padding: 25px;
+
+  background-color: white;
+  border: 1px solid #eee8f7;
+  border-radius: 22px;
+
+  box-shadow: 0 8px 25px rgba(80, 65, 120, 0.06);
+}
+
+.info-icon {
+  margin-bottom: 12px;
+  font-size: 25px;
+}
+
+.info-card h3 {
+  margin: 0 0 8px;
+
+  color: #403957;
+  font-size: 18px;
+}
+
+.info-card p {
+  margin: 0;
+
+  color: #817a99;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* Form */
+
+.confession-form {
+  padding: 35px;
+
+  background-color: white;
+  border: 1px solid #eee8f7;
+  border-radius: 25px;
+
+  box-shadow: 0 10px 30px rgba(80, 65, 120, 0.08);
+}
+
+.form-group {
+  margin-bottom: 28px;
+}
+
+.form-group h4 {
+  margin: 0 0 10px;
+
+  color: #403957;
+  font-size: 17px;
+}
+
+.form-category {
+  margin: 0 0 13px;
+
+  color: #9189a5;
+  font-size: 14px;
+}
+
+
+/* Recipient */
+
+.form-group > span {
+  color: #756b8d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-top: 9px;
+  padding: 14px 16px;
+
+  border: 1px solid #ddd5ee;
+  border-radius: 13px;
+
+  background-color: white;
+  color: #403957;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #a28be8;
+
+  box-shadow: 0 0 0 3px rgba(162, 139, 232, 0.1);
+}
+
+
+/* Category and mood */
+
+.option-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.option-button {
+  padding: 10px 15px;
+
+  border: 1px solid #e1d9f0;
+  border-radius: 25px;
+
+  background-color: white;
+  color: #514968;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.option-button:hover {
+  border-color: #b7a3e8;
+}
+
+.option-button.selected {
+  background-color: #403957;
+  border-color: #403957;
+  color: white;
+}
+
+
+/* Message */
+
+.form-group textarea {
+  width: 100%;
+  min-height: 145px;
+  box-sizing: border-box;
+
+  padding: 15px;
+
+  border: 1px solid #ddd5ee;
+  border-radius: 13px;
+
+  background-color: white;
+  color: #403957;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+
+  resize: vertical;
+  outline: none;
+}
+
+.form-group textarea:focus {
+  border-color: #a28be8;
+
+  box-shadow: 0 0 0 3px rgba(162, 139, 232, 0.1);
+}
+
+
+/* Character count */
+
+.character-count {
+  margin-top: 6px;
+
+  color: #958da8;
+
+  font-size: 12px;
+  text-align: right;
+}
+
+
+/* Submit button */
+
+.anonymous-button {
+  width: 100%;
+
+  padding: 15px;
+
+  border: none;
+  border-radius: 30px;
+
+  background: linear-gradient(135deg, #ff6ba9, #8b5cf6);
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.anonymous-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+}
+
+
+/* Privacy text */
+
+.privacy-note {
+  margin: 13px 0 0;
+
+  color: #938aa6;
+
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+
+/* Success message */
+
+.success-message {
+  margin-top: 15px;
+  padding: 12px;
+
+  border: 1px solid #ccebd8;
+  border-radius: 12px;
+
+  background-color: #f1fff6;
+  color: #43815d;
+
+  font-size: 14px;
+  text-align: center;
+}
+
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .write-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .write-page {
+    padding: 35px 20px;
+  }
+
+  .write-intro h1 {
+    font-size: 34px;
+  }
+
+  .kindness-prompt,
+  .confession-form {
+    padding: 25px;
+  }
+
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .option-button {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+}
