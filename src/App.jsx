@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./style/global.css";
+import "./style/Wall.css"
+import "./style/Profile.css";
+import "./style/MainWall.css";
+import "./style/Notification.css"
 
 import Home from "./pages/Home";
 import Wall from "./pages/Wall";

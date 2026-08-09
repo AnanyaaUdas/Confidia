@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
+
 
 const Hero = () => {
   return (
@@ -19,7 +21,9 @@ const Hero = () => {
           <br />
           kindness means
           <br />
-          <span>the most.</span>
+          <div className="pink-text"> 
+            <span>the most.</span>
+          </div>
         </h1>
 
         <p>
@@ -27,6 +31,20 @@ const Hero = () => {
           No usernames, no profile pictures — just the kind words someone
           needed to hear today.
         </p>
+        <div className="hero-buttons">
+          <Link to="/write">
+          <button className="primary-btn">
+            ✍️ Write a Compliment
+          </button>
+          </Link>
+
+          <Link to = "/wall">
+          <button className="secondary-btn">
+            Read the Wall
+          </button>
+          </Link>
+        </div>
+         
 
       </div>
 
@@ -45,6 +63,9 @@ const Hero = () => {
         <div className="card-footer">
             <span>⭐ Featured by Admin</span>
             <span>💙 Anonymous</span>
+        </div>
+        <div className="streak-badge">
+          🔥 Kindness Streak · 5 Days
         </div>
 
     </div>
