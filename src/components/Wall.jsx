@@ -1,113 +1,19 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import ComplimentCard from "./ComplimentCard";
-import Profile from "./ProfilePage";
-
-const compliments = [
-  {
-    featured: true,
-    to: "COMPUTER SCIENCE DEPARTMENT",
-    message: "Thank you for organizing amazing workshops.",
-    time: "3h ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [28, 16, 4],
-    emoji: "🌞",
-  },
-
-  {
-    to: "LIBRARY STAFF",
-    message:
-      "Shoutout to the library staff for always being kind, even five minutes before closing.",
-    time: "9h ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [19, 12, 1],
-    emoji: "😊",
-  },
-
-  {
-    to: "PROF. FROM SEM 3 MATHS",
-    message:
-      "You explained the same doubt four times without making me feel stupid. Thank you.",
-    time: "20h ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [63, 22, 9],
-    emoji: "👏",
-  },
-
-  {
-    to: "A STRANGER IN THE CORRIDOR",
-    message:
-      "To the person who helped me carry my books yesterday, thank you. You probably don't know how much that meant.",
-    time: "6h ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [54, 31, 2],
-    emoji: "💙",
-  },
-
-  {
-    to: "WHOEVER FOUND MY WALLET",
-    message:
-      "To whoever returned my lost wallet, you're amazing.",
-    time: "12h ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [87, 40, 6],
-    emoji: "😊",
-  },
-
-  {
-    to: "DRAMA CLUB",
-    message:
-      "Your last play made me cry in the best way. Please never stop.",
-    time: "1d ago",
-    reactions: ["❤️", "😊", "👏"],
-    counts: [31, 18, 5],
-    emoji: "🌞",
-  },
-];
+import useAppStore from "../store/useAppStore";
 
 const Wall = () => {
-  const [openReply, setOpenReply] = useState(1);
-
+  const [openReply, setOpenReply] = useState(null);
   const [replyText, setReplyText] = useState("");
 
-  // Which reactions the current user clicked
-  const [userReactions, setUserReactions] = useState({});
+  const compliments = useAppStore((state) => state.compliments);
+  const reactionCounts = useAppStore((state) => state.reactionCounts);
+  const userReactions = useAppStore((state) => state.userReactions);
+  const handleReaction = useAppStore((state) => state.handleReaction);
 
-  // Reaction counts for every card
-  const [reactionCounts, setReactionCounts] = useState(
-    compliments.map((item) => [...item.counts])
-  );
-
-  const handleReaction = (cardIndex, reactionIndex) => {
-    const reactionKey = `${cardIndex}-${reactionIndex}`;
-
-    const alreadyReacted =
-      userReactions[reactionKey] === true;
-
-    // Toggle selected state
-    setUserReactions((previous) => ({
-      ...previous,
-      [reactionKey]: !alreadyReacted,
-    }));
-
-    // Update count
-    setReactionCounts((previous) =>
-      previous.map((cardCounts, index) => {
-        if (index !== cardIndex) {
-          return cardCounts;
-        }
-
-        return cardCounts.map((count, rIndex) => {
-          if (rIndex !== reactionIndex) {
-            return count;
-          }
-
-          return alreadyReacted
-            ? count - 1
-            : count + 1;
-        });
-      })
-    );
-  };
+  // Just a preview on the home page — first 6 live compliments
+  const preview = compliments.slice(0, 6);
 
   return (
     <div className="wall-page">
@@ -127,16 +33,14 @@ const Wall = () => {
 
       {/* =========================
           COMPLIMENT GRID
-          (now using the shared ComplimentCard component)
       ========================= */}
 
       <section className="compliment-grid">
 
-        {compliments.map((item, index) => (
+        {preview.map((item) => (
           <ComplimentCard
-            key={index}
+            key={item.id}
             item={item}
-            index={index}
             openReply={openReply}
             setOpenReply={setOpenReply}
             replyText={replyText}
@@ -156,26 +60,20 @@ const Wall = () => {
 
       <div className="whole-wall">
 
-        <button className="whole-wall-btn">
+        <Link to="/wall" className="whole-wall-btn">
           See the whole wall →
-        </button>
+        </Link>
 
       </div>
 
 
       {/* =========================
-          KINDNESS PROFILE
-      ========================= */}
-
-     
-
-      {/* =========================
           FIXED SHARE BUTTON
       ========================= */}
 
-      <button className="wall-share-btn">
+      <Link to="/write" className="wall-share-btn">
         ＋ Share Kindness
-      </button>
+      </Link>
 
     </div>
   );

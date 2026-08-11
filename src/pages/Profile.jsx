@@ -1,6 +1,6 @@
 import React from 'react'
 import NavBar from '../components/NavBar'
-import Badges from '../components/badges'
+import Badges from '../components/Badges'
 import Footer from '../components/Footer'
 
 const Profile = () => {

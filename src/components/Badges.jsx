@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import ProfilePage from "./ProfilePage";
+import useAppStore from "../store/useAppStore";
 
 
 // MOCK — replace with real auth/user data later
-const mockUser = {
-    name: "Priyanya",
-    memberSince: "August 2026",
-    complimentsShared: 3,
-    reactionsGiven: 12,
-    dayStreak: 1,
-};
 
 const kindnessCloud = [
     { word: "Helpful", size: "lg", color: "pink" },
@@ -25,15 +19,15 @@ const kindnessCloud = [
 const Badges = () => {
 
     // DEV-ONLY toggle to preview logged-in state — remove once real login exists
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+    const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+    const toggleLogin = useAppStore((state) => state.toggleLogin);
+    const user = useAppStore((state) => state.user);
     return (
         <div className="profile-page">
 
             <button
                 className="dev-toggle"
-                onClick={() => setIsLoggedIn((prev) => !prev)}
-            >
+                onClick={toggleLogin}            >
                 Dev: {isLoggedIn ? "Log out" : "Log in"} preview
             </button>
 
@@ -45,31 +39,31 @@ const Badges = () => {
                 <div className="welcome-card">
 
                     <div className="welcome-avatar">
-                        {mockUser.name.charAt(0)}
+                        {User.name.charAt(0)}
                     </div>
 
                     <div className="welcome-info">
 
-                        <h3>{mockUser.name}</h3>
+                        <h3>{User.name}</h3>
 
                         <span className="welcome-since">
-                            Member since {mockUser.memberSince}
+                            Member since {User.memberSince}
                         </span>
 
                         <div className="welcome-stats">
 
                             <div className="welcome-stat">
-                                <strong>{mockUser.complimentsShared}</strong>
+                                <strong>{User.complimentsShared}</strong>
                                 <span>Compliments shared</span>
                             </div>
 
                             <div className="welcome-stat">
-                                <strong>{mockUser.reactionsGiven}</strong>
+                                <strong>{User.reactionsGiven}</strong>
                                 <span>Reactions given</span>
                             </div>
 
                             <div className="welcome-stat">
-                                <strong>{mockUser.dayStreak}</strong>
+                                <strong>{User.dayStreak}</strong>
                                 <span>Day streak</span>
                             </div>
 

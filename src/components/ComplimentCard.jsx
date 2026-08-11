@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ReactionButton from "./ReactionButton";
+import useAppStore from "../store/useAppStore";
 
 const ComplimentCard = ({
     item,
-    index,
     openReply,
     setOpenReply,
     replyText,
@@ -14,12 +14,17 @@ const ComplimentCard = ({
 }) => {
 
     const [showReportModal, setShowReportModal] = useState(false);
-    const [reported, setReported] = useState(false);
+
+    const reportCompliment = useAppStore((state) => state.reportCompliment);
+
+    const isReported = item.reported;
 
     const confirmReport = () => {
-        setReported(true);
+        reportCompliment(item.id, "Reported by a user");
         setShowReportModal(false);
     };
+
+    const counts = reactionCounts[item.id] || item.counts || [0, 0, 0];
 
     return (
         <article className="compliment-card">
@@ -78,7 +83,7 @@ const ComplimentCard = ({
                     (reaction, reactionIndex) => {
 
                         const reactionKey =
-                            `${index}-${reactionIndex}`;
+                            `${item.id}-${reactionIndex}`;
 
                         const isSelected =
                             userReactions[reactionKey];
@@ -87,15 +92,11 @@ const ComplimentCard = ({
                             <ReactionButton
                                 key={reactionIndex}
                                 emoji={reaction}
-                                count={
-                                    reactionCounts[index][
-                                        reactionIndex
-                                    ]
-                                }
+                                count={counts[reactionIndex]}
                                 selected={isSelected}
                                 onClick={() =>
                                     handleReaction(
-                                        index,
+                                        item.id,
                                         reactionIndex
                                     )
                                 }
@@ -108,9 +109,9 @@ const ComplimentCard = ({
                 <button
                     className="report-btn"
                     onClick={() => setShowReportModal(true)}
-                    disabled={reported}
+                    disabled={isReported}
                 >
-                    {reported ? "Reported" : "Report"}
+                    {isReported ? "Reported" : "Report"}
                 </button>
 
             </div>
@@ -127,16 +128,16 @@ const ComplimentCard = ({
                 className="reply-toggle"
                 onClick={() =>
                     setOpenReply(
-                        openReply === index
+                        openReply === item.id
                             ? null
-                            : index
+                            : item.id
                     )
                 }
             >
 
                 💬 Reply anonymously{" "}
 
-                {openReply === index
+                {openReply === item.id
                     ? "▲"
                     : "▼"}
 
@@ -145,7 +146,7 @@ const ComplimentCard = ({
 
             {/* REPLY BOX */}
 
-            {openReply === index && (
+            {openReply === item.id && (
 
                 <div className="reply-box">
 
