@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ComplimentCard from "./ComplimentCard";
+import useAppStore from "../store/useAppStore";
 
 const filters = [
     {
@@ -29,25 +30,20 @@ const filters = [
     },
 ];
 
-
-// TEMPORARY DATA
-// Later this will come from your backend
+// =========================
+// EXISTING COMPLIMENTS
+// =========================
 
 const compliments = [
     {
         featured: true,
         emoji: "🌟",
         to: "COMPUTER SCIENCE DEPARTMENT",
-        message: "Thank you for organizing amazing workshops.",
+        message:
+            "Thank you for organizing amazing workshops.",
         time: "1d ago",
         category: "college",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [28, 16, 4],
     },
 
@@ -55,16 +51,11 @@ const compliments = [
         featured: false,
         emoji: "😊",
         to: "WHOEVER FOUND MY WALLET",
-        message: "To whoever returned my lost wallet, you're amazing.",
+        message:
+            "To whoever returned my lost wallet, you're amazing.",
         time: "1d ago",
         category: "friends",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [87, 40, 6],
     },
 
@@ -72,16 +63,11 @@ const compliments = [
         featured: false,
         emoji: "💙",
         to: "THE LAB ASSISTANT",
-        message: "You stayed back so we could finish our project. Quiet kindness counts the most.",
+        message:
+            "You stayed back so we could finish our project. Quiet kindness counts the most.",
         time: "2d ago",
         category: "college",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [22, 9, 2],
     },
 
@@ -89,16 +75,11 @@ const compliments = [
         featured: false,
         emoji: "🌸",
         to: "MY BEST FRIEND",
-        message: "Thank you for always listening when I need someone.",
+        message:
+            "Thank you for always listening when I need someone.",
         time: "3d ago",
         category: "friends",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [45, 20, 3],
     },
 
@@ -106,16 +87,11 @@ const compliments = [
         featured: false,
         emoji: "🎓",
         to: "DRAMA CLUB",
-        message: "Your last performance was amazing. Please never stop creating.",
+        message:
+            "Your last performance was amazing. Please never stop creating.",
         time: "4d ago",
         category: "clubs",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [31, 18, 5],
     },
 
@@ -123,25 +99,27 @@ const compliments = [
         featured: false,
         emoji: "👩‍🏫",
         to: "PROF. FROM SEM 3 MATHS",
-        message: "Thank you for explaining the same doubt without making me feel stupid.",
+        message:
+            "Thank you for explaining the same doubt without making me feel stupid.",
         time: "5d ago",
         category: "teacher",
-
-        reactions: [
-            "❤️",
-            "😊",
-            "👏",
-        ],
-
+        reactions: ["❤️", "😊", "👏"],
         counts: [63, 22, 9],
     },
 ];
 
-
 const MainWall = () => {
+
+    // =========================
+    // FILTER
+    // =========================
 
     const [activeFilter, setActiveFilter] =
         useState("everyone");
+
+    // =========================
+    // REPLY
+    // =========================
 
     const [openReply, setOpenReply] =
         useState(null);
@@ -149,27 +127,58 @@ const MainWall = () => {
     const [replyText, setReplyText] =
         useState("");
 
+    // =========================
+    // GET NEW COMPLIMENTS
+    // FROM ZUSTAND
+    // =========================
+
+    const storedCompliments = useAppStore(
+        (state) => state.compliments
+    );
+
+    // =========================
+    // COMBINE OLD + NEW
+    // =========================
+
+    const allCompliments = [
+        ...compliments,
+        ...storedCompliments,
+    ];
+
+    // =========================
+    // REACTION COUNTS
+    // =========================
+
     const [reactionCounts, setReactionCounts] =
         useState(
-            compliments.map((item) => [...item.counts])
+            allCompliments.map((item) => [
+                ...(item.counts || [0, 0, 0]),
+            ])
         );
+
+    // =========================
+    // USER REACTIONS
+    // =========================
 
     const [userReactions, setUserReactions] =
         useState({});
 
-
+    // =========================
     // FILTER COMPLIMENTS
+    // =========================
 
     const filteredCompliments =
         activeFilter === "everyone"
-            ? compliments
-            : compliments.filter(
+            ? allCompliments
+            : allCompliments.filter(
                 (item) =>
-                    item.category === activeFilter
+                    item.category?.toLowerCase() ===
+                    activeFilter
             );
 
-
+    // =========================
     // REACTION HANDLER
+    // =========================
 
     const handleReaction = (
         index,
@@ -179,21 +188,35 @@ const MainWall = () => {
         const key =
             `${index}-${reactionIndex}`;
 
+        const alreadyReacted =
+            userReactions[key];
+
+        // Update selected reaction
         setUserReactions((prev) => ({
             ...prev,
             [key]: !prev[key],
         }));
 
+        // Update reaction count
         setReactionCounts((prev) => {
 
             const updated = [...prev];
+
+            // Make sure this index exists
+            if (!updated[index]) {
+                updated[index] = [0, 0, 0];
+            }
 
             updated[index] = [
                 ...updated[index],
             ];
 
-            if (userReactions[key]) {
-                updated[index][reactionIndex] -= 1;
+            if (alreadyReacted) {
+                updated[index][reactionIndex] =
+                    Math.max(
+                        0,
+                        updated[index][reactionIndex] - 1
+                    );
             } else {
                 updated[index][reactionIndex] += 1;
             }
@@ -202,12 +225,13 @@ const MainWall = () => {
         });
     };
 
-
     return (
 
         <section className="wall-page">
 
-            {/* HEADER */}
+            {/* =========================
+                HEADER
+            ========================= */}
 
             <div className="wall-header">
 
@@ -222,7 +246,9 @@ const MainWall = () => {
             </div>
 
 
-            {/* SEARCH */}
+            {/* =========================
+                SEARCH
+            ========================= */}
 
             <div className="wall-search">
 
@@ -238,7 +264,9 @@ const MainWall = () => {
             </div>
 
 
-            {/* FILTERS */}
+            {/* =========================
+                FILTERS
+            ========================= */}
 
             <div className="filter-row">
 
@@ -246,13 +274,12 @@ const MainWall = () => {
 
                     <button
                         key={filter.value}
-
+                        type="button"
                         className={
                             activeFilter === filter.value
                                 ? "filter-btn active"
                                 : "filter-btn"
                         }
-
                         onClick={() =>
                             setActiveFilter(
                                 filter.value
@@ -273,7 +300,9 @@ const MainWall = () => {
             </div>
 
 
-            {/* COMPLIMENT CARDS */}
+            {/* =========================
+                COMPLIMENT CARDS
+            ========================= */}
 
             <div className="compliment-grid">
 
@@ -282,18 +311,18 @@ const MainWall = () => {
 
                         <ComplimentCard
                             key={index}
-
                             item={item}
-
                             index={index}
 
                             openReply={openReply}
-
-                            setOpenReply={setOpenReply}
+                            setOpenReply={
+                                setOpenReply
+                            }
 
                             replyText={replyText}
-
-                            setReplyText={setReplyText}
+                            setReplyText={
+                                setReplyText
+                            }
 
                             reactionCounts={
                                 reactionCounts

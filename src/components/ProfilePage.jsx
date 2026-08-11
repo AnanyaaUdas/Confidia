@@ -1,13 +1,15 @@
 import React from "react";
 import BadgeCard from "./BadgeCard";
-import { Link } from "react-router-dom";
 import useAppStore from "../store/useAppStore";
 
 const ProfilePage = () => {
+  // Get user data and badges from Zustand
   const User = useAppStore((state) => state.User);
   const badges = useAppStore((state) => state.badges);
 
+  // Calculate badge progress dynamically
   const calculatedBadges = badges.map((badge) => {
+    // First Compliment
     if (badge.title === "First Compliment") {
       return {
         ...badge,
@@ -16,6 +18,7 @@ const ProfilePage = () => {
       };
     }
 
+    // Spread Happiness
     if (badge.title === "Spread Happiness") {
       return {
         ...badge,
@@ -24,6 +27,7 @@ const ProfilePage = () => {
       };
     }
 
+    // Campus Hero
     if (badge.title === "Campus Hero") {
       return {
         ...badge,
@@ -32,6 +36,7 @@ const ProfilePage = () => {
       };
     }
 
+    // Kindness Streak
     if (badge.title === "Kindness Streak") {
       return {
         ...badge,
@@ -46,6 +51,7 @@ const ProfilePage = () => {
   return (
     <section className="kindness-profile">
 
+      {/* PROFILE HEADING */}
       <div className="profile-heading">
 
         <div>
@@ -57,12 +63,9 @@ const ProfilePage = () => {
           </p>
         </div>
 
-        <Link to="/profile" className="profile-btn">
-          View full profile →
-        </Link>
-
       </div>
 
+      {/* BADGES */}
       <div className="badge-grid">
 
         {calculatedBadges.map((badge, index) => (

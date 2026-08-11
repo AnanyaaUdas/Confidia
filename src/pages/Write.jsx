@@ -1,233 +1,575 @@
 import React, { useState } from "react";
-import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import NavBar from "../components/NavBar";
 import "../style/Write.css";
+import useAppStore from "../store/useAppStore";
 
 const prompts = [
-  "Thank someone who helped you this week.",
-  "Compliment someone who made your day better.",
-  "Thank a teacher who inspired you.",
-  "Appreciate someone who always makes people smile.",
-  "Write something kind to someone who deserves to hear it."
+    "Thank someone who helped you this week.",
+    "Compliment someone who made your day better.",
+    "Thank a teacher who inspired you.",
+    "Appreciate someone who always makes people smile.",
+    "Write something kind to someone who deserves to hear it.",
 ];
 
 const categories = [
-  { label: "Everyone", icon: "🌸" },
-  { label: "Friends", icon: "💗" },
-  { label: "Teachers", icon: "🧑‍🏫" },
-  { label: "College", icon: "🏫" },
-  { label: "Clubs", icon: "🎓" }
+    {
+        label: "Everyone",
+        icon: "🌸",
+        value: "everyone",
+    },
+    {
+        label: "Friends",
+        icon: "💗",
+        value: "friends",
+    },
+    {
+        label: "Teachers",
+        icon: "🧑‍🏫",
+        value: "teacher",
+    },
+    {
+        label: "College",
+        icon: "🏫",
+        value: "college",
+    },
+    {
+        label: "Clubs",
+        icon: "🎓",
+        value: "clubs",
+    },
 ];
 
 const moods = [
-  { label: "Grateful", icon: "🥰" },
-  { label: "Happy", icon: "😊" },
-  { label: "Inspired", icon: "🌟" },
-  { label: "Proud", icon: "👏" },
-  { label: "Appreciative", icon: "💙" }
+    {
+        label: "Grateful",
+        icon: "🥰",
+    },
+    {
+        label: "Happy",
+        icon: "😊",
+    },
+    {
+        label: "Inspired",
+        icon: "🌟",
+    },
+    {
+        label: "Proud",
+        icon: "👏",
+    },
+    {
+        label: "Appreciative",
+        icon: "💙",
+    },
 ];
 
 const Write = () => {
-  const [recipient, setRecipient] = useState("");
-  const [message, setMessage] = useState("");
-  const [category, setCategory] = useState("Everyone");
-  const [mood, setMood] = useState("Grateful");
-  const [prompt, setPrompt] = useState(prompts[0]);
-  const [submitted, setSubmitted] = useState(false);
 
-  const spinWheel = () => {
-    const randomIndex = Math.floor(Math.random() * prompts.length);
-    setPrompt(prompts[randomIndex]);
-  };
+    // =========================
+    // FORM STATES
+    // =========================
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    const [recipient, setRecipient] = useState("");
+    const [message, setMessage] = useState("");
 
-    if (!recipient.trim() || !message.trim()) {
-      alert("Please enter a recipient and a compliment.");
-      return;
-    }
+    // IMPORTANT:
+    // Store the filter value, not the label
+    const [category, setCategory] =
+        useState("everyone");
 
-    const compliment = {
-      recipient,
-      message,
-      category,
-      mood,
-      createdAt: new Date().toISOString()
-    };
+    const [mood, setMood] =
+        useState("Grateful");
 
-    const savedCompliments =
-      JSON.parse(localStorage.getItem("confidiaCompliments")) || [];
+    const [prompt, setPrompt] =
+        useState(prompts[0]);
 
-    localStorage.setItem(
-      "confidiaCompliments",
-      JSON.stringify([...savedCompliments, compliment])
+    const [submitted, setSubmitted] =
+        useState(false);
+
+
+    // =========================
+    // ZUSTAND
+    // =========================
+
+    const addCompliment = useAppStore(
+        (state) => state.addCompliment
     );
 
-    setSubmitted(true);
-    setRecipient("");
-    setMessage("");
-    setCategory("Everyone");
-    setMood("Grateful");
 
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 3000);
-  };
+    // =========================
+    // RANDOM PROMPT
+    // =========================
 
-  return (
-    <>
-      <NavBar />
+    const spinWheel = () => {
 
-      <main className="write-page">
-        <div className="write-intro">
-          <h1>Write a compliment</h1>
+        const randomIndex = Math.floor(
+            Math.random() * prompts.length
+        );
 
-          <p>
-            Nobody will ever see your name. Only the messages pass moderation.
-          </p>
-        </div>
+        setPrompt(
+            prompts[randomIndex]
+        );
+    };
 
-        <section className="write-layout">
-          <div className="write-left">
 
-            <div className="kindness-prompt">
-              <p>
-                <b>🎯 RANDOM KINDNESS PROMPT</b>
-              </p>
+    // =========================
+    // SUBMIT
+    // =========================
 
-              <h2>{prompt}</h2>
+    const handleSubmit = (e) => {
 
-              <button
-                type="button"
-                className="wheel-button"
-                onClick={spinWheel}
-              >
-                🎲 Spin the Kindness Wheel
-              </button>
-            </div>
+        e.preventDefault();
 
-            <div className="info-cards">
+        // Check required fields
+        if (
+            !recipient.trim() ||
+            !message.trim()
+        ) {
+            alert(
+                "Please enter a recipient and a compliment."
+            );
 
-              <div className="info-card">
-                <div className="info-icon">💌</div>
+            return;
+        }
 
-                <h3>Secret reply</h3>
 
-                <p>
-                  Recipients can post an anonymous thank-you underneath.
-                </p>
-              </div>
+        // =========================
+        // CREATE COMPLIMENT
+        // =========================
 
-              <div className="info-card">
-                <div className="info-icon">🚨</div>
+        const compliment = {
 
-                <h3>Gentle moderation</h3>
+            to: recipient.trim(),
 
-                <p>
-                  Report a post and an admin reviews it — kindness stays kind.
-                </p>
-              </div>
+            message: message.trim(),
 
-            </div>
-          </div>
+            // This will now be:
+            // everyone / friends / teacher / college / clubs
+            category: category,
 
-          <form className="confession-form" onSubmit={handleSubmit}>
+            mood: mood,
 
-            <div className="form-group">
-              <h4>Recipient</h4>
+            createdAt:
+                new Date().toISOString(),
 
-              <span>To:</span>
+            time: "Just now",
 
-              <input
-                type="text"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
-                placeholder="A stranger in the corridor, Prof. Sharma, Drama Club..."
-              />
-            </div>
+            reactions: [
+                "❤️",
+                "😊",
+                "👏",
+            ],
 
-            <div className="form-group">
-              <h4>Category</h4>
+            counts: [
+                0,
+                0,
+                0,
+            ],
 
-              <p className="form-category">
-                Where should this show up on the wall?
-              </p>
+            emoji: "💗",
+        };
 
-              <div className="option-list">
-                {categories.map((item) => (
-                  <button
-                    type="button"
-                    key={item.label}
-                    className={`option-button ${
-                      category === item.label ? "selected" : ""
-                    }`}
-                    onClick={() => setCategory(item.label)}
-                  >
-                    <span>{item.icon}</span>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            <div className="form-group">
-              <h4>Message</h4>
+        // =========================
+        // ADD TO ZUSTAND
+        // =========================
 
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="To the person who helped me carry my books yesterday..."
-                maxLength={240}
-              />
+        addCompliment(
+            compliment
+        );
 
-              <div className="character-count">
-                {message.length}/240
-              </div>
-            </div>
 
-            <div className="form-group">
-              <h4>Mood</h4>
+        // =========================
+        // LOCAL STORAGE
+        // =========================
 
-              <div className="option-list">
-                {moods.map((item) => (
-                  <button
-                    type="button"
-                    key={item.label}
-                    className={`option-button ${
-                      mood === item.label ? "selected" : ""
-                    }`}
-                    onClick={() => setMood(item.label)}
-                  >
-                    <span>{item.icon}</span>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+        const savedCompliments =
+            JSON.parse(
+                localStorage.getItem(
+                    "confidiaCompliments"
+                )
+            ) || [];
 
-            <button type="submit" className="anonymous-button">
-              Post anonymously 💌
-            </button>
 
-            <p className="privacy-note">
-              Your post stays anonymous. It's saved locally in your browser
-              for this demo.
-            </p>
+        localStorage.setItem(
+            "confidiaCompliments",
+            JSON.stringify([
+                ...savedCompliments,
+                compliment,
+            ])
+        );
 
-            {submitted && (
-              <div className="success-message">
-                💗 Your kindness has been posted anonymously!
-              </div>
-            )}
 
-          </form>
-        </section>
-      </main>
+        // =========================
+        // SUCCESS
+        // =========================
 
-      <Footer />
-    </>
-  );
+        setSubmitted(true);
+
+
+        // Clear form
+        setRecipient("");
+
+        setMessage("");
+
+        setCategory(
+            "everyone"
+        );
+
+        setMood(
+            "Grateful"
+        );
+
+
+        // Hide success message
+        setTimeout(() => {
+
+            setSubmitted(false);
+
+        }, 3000);
+    };
+
+
+    return (
+        <>
+
+            {/* =========================
+                NAVBAR
+            ========================= */}
+
+            <NavBar />
+
+
+            {/* =========================
+                MAIN WRITE PAGE
+            ========================= */}
+
+            <main className="write-page">
+
+
+                {/* =========================
+                    INTRO
+                ========================= */}
+
+                <div className="write-intro">
+
+                    <h1>
+                        Write a compliment
+                    </h1>
+
+                    <p>
+                        Nobody will ever see your name.
+                        Only the messages pass moderation.
+                    </p>
+
+                </div>
+
+
+                {/* =========================
+                    WRITE LAYOUT
+                ========================= */}
+
+                <section className="write-layout">
+
+
+                    {/* =========================
+                        LEFT SIDE
+                    ========================= */}
+
+                    <div className="write-left">
+
+
+                        {/* RANDOM PROMPT */}
+
+                        <div className="kindness-prompt">
+
+                            <p>
+                                <b>
+                                    🎯 RANDOM KINDNESS PROMPT
+                                </b>
+                            </p>
+
+                            <h2>
+                                {prompt}
+                            </h2>
+
+                            <button
+                                type="button"
+                                className="wheel-button"
+                                onClick={spinWheel}
+                            >
+                                🎲 Spin the Kindness Wheel
+                            </button>
+
+                        </div>
+
+
+                        {/* INFO CARDS */}
+
+                        <div className="info-cards">
+
+
+                            {/* SECRET REPLY */}
+
+                            <div className="info-card">
+
+                                <div className="info-icon">
+                                    💌
+                                </div>
+
+                                <h3>
+                                    Secret reply
+                                </h3>
+
+                                <p>
+                                    Recipients can post an
+                                    anonymous thank-you
+                                    underneath.
+                                </p>
+
+                            </div>
+
+
+                            {/* MODERATION */}
+
+                            <div className="info-card">
+
+                                <div className="info-icon">
+                                    🚨
+                                </div>
+
+                                <h3>
+                                    Gentle moderation
+                                </h3>
+
+                                <p>
+                                    Report a post and an admin
+                                    reviews it — kindness stays
+                                    kind.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* =========================
+                        FORM
+                    ======================== */}
+
+                    <form
+                        className="confession-form"
+                        onSubmit={handleSubmit}
+                    >
+
+
+                        {/* =========================
+                            RECIPIENT
+                        ========================= */}
+
+                        <div className="form-group">
+
+                            <h4>
+                                Recipient
+                            </h4>
+
+                            <span>
+                                To:
+                            </span>
+
+                            <input
+                                type="text"
+                                value={recipient}
+                                onChange={(e) =>
+                                    setRecipient(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="A stranger in the corridor, Prof. Sharma, Drama Club..."
+                            />
+
+                        </div>
+
+
+                        {/* =========================
+                            CATEGORY
+                        ========================= */}
+
+                        <div className="form-group">
+
+                            <h4>
+                                Category
+                            </h4>
+
+                            <p className="form-category">
+                                Where should this show up
+                                on the wall?
+                            </p>
+
+
+                            <div className="option-list">
+
+                                {categories.map(
+                                    (item) => (
+
+                                        <button
+                                            type="button"
+                                            key={item.value}
+                                            className={`option-button ${
+                                                category ===
+                                                item.value
+                                                    ? "selected"
+                                                    : ""
+                                            }`}
+                                            onClick={() =>
+                                                setCategory(
+                                                    item.value
+                                                )
+                                            }
+                                        >
+
+                                            <span>
+                                                {item.icon}
+                                            </span>
+
+                                            {item.label}
+
+                                        </button>
+
+                                    )
+                                )}
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =========================
+                            MESSAGE
+                        ========================= */}
+
+                        <div className="form-group">
+
+                            <h4>
+                                Message
+                            </h4>
+
+                            <textarea
+                                value={message}
+                                onChange={(e) =>
+                                    setMessage(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="To the person who helped me carry my books yesterday..."
+                                maxLength={240}
+                            />
+
+                            <div className="character-count">
+                                {message.length}/240
+                            </div>
+
+                        </div>
+
+
+                        {/* =========================
+                            MOOD
+                        ========================= */}
+
+                        <div className="form-group">
+
+                            <h4>
+                                Mood
+                            </h4>
+
+                            <div className="option-list">
+
+                                {moods.map(
+                                    (item) => (
+
+                                        <button
+                                            type="button"
+                                            key={item.label}
+                                            className={`option-button ${
+                                                mood ===
+                                                item.label
+                                                    ? "selected"
+                                                    : ""
+                                            }`}
+                                            onClick={() =>
+                                                setMood(
+                                                    item.label
+                                                )
+                                            }
+                                        >
+
+                                            <span>
+                                                {item.icon}
+                                            </span>
+
+                                            {item.label}
+
+                                        </button>
+
+                                    )
+                                )}
+
+                            </div>
+
+                        </div>
+
+
+                        {/*
+                            SUBMIT
+                         */}
+
+                        <button
+                            type="submit"
+                            className="anonymous-button"
+                        >
+                            Post anonymously 💌
+                        </button>
+
+
+                        {/* PRIVACY */}
+
+                        <p className="privacy-note">
+                            Your post stays anonymous.
+                            It's saved locally in your
+                            browser for this demo.
+                        </p>
+
+
+                        {/* SUCCESS */}
+
+                        {submitted && (
+
+                            <div className="success-message">
+
+                                💗 Your kindness has been
+                                posted anonymously!
+
+                            </div>
+
+                        )}
+
+                    </form>
+
+                </section>
+
+            </main>
+
+
+            {/* =========================
+                FOOTER
+            ========================= */}
+
+            <Footer />
+
+        </>
+    );
 };
 
 export default Write;
