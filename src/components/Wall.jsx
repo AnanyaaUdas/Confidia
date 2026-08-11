@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ComplimentCard from "./ComplimentCard";
 import Profile from "./ProfilePage";
+import useAppStore from "../store/useAppStore";
 
 const compliments = [
   {
@@ -70,45 +71,15 @@ const Wall = () => {
   const [replyText, setReplyText] = useState("");
 
   // Which reactions the current user clicked
-  const [userReactions, setUserReactions] = useState({});
-
-  // Reaction counts for every card
-  const [reactionCounts, setReactionCounts] = useState(
-    compliments.map((item) => [...item.counts])
-  );
-
-  const handleReaction = (cardIndex, reactionIndex) => {
-    const reactionKey = `${cardIndex}-${reactionIndex}`;
-
-    const alreadyReacted =
-      userReactions[reactionKey] === true;
-
-    // Toggle selected state
-    setUserReactions((previous) => ({
-      ...previous,
-      [reactionKey]: !alreadyReacted,
-    }));
-
-    // Update count
-    setReactionCounts((previous) =>
-      previous.map((cardCounts, index) => {
-        if (index !== cardIndex) {
-          return cardCounts;
-        }
-
-        return cardCounts.map((count, rIndex) => {
-          if (rIndex !== reactionIndex) {
-            return count;
-          }
-
-          return alreadyReacted
-            ? count - 1
-            : count + 1;
-        });
-      })
-    );
-  };
-
+const reactionCounts = useAppStore(
+  (state) => state.reactionCounts
+);
+const userReactions = useAppStore(
+  (state) => state.userReactions
+);
+const handleReaction = useAppStore(
+  (state) => state.handleReaction
+);
   return (
     <div className="wall-page">
 
