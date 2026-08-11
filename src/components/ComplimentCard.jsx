@@ -72,48 +72,55 @@ const ComplimentCard = ({
 
             {/* REACTIONS */}
 
-            <div className="reaction-row">
+            {/* REACTIONS */}
 
-                {item.reactions.map(
-                    (reaction, reactionIndex) => {
+<div className="reaction-row">
 
-                        const reactionKey =
-                            `${index}-${reactionIndex}`;
+  {item.reactions.map(
+    (reaction, reactionIndex) => {
 
-                        const isSelected =
-                            userReactions[reactionKey];
+      const reactionKey =
+        `${index}-${reactionIndex}`;
 
-                        return (
-                            <ReactionButton
-                                key={reactionIndex}
-                                emoji={reaction}
-                                count={
-                                    reactionCounts[index][
-                                        reactionIndex
-                                    ]
-                                }
-                                selected={isSelected}
-                                onClick={() =>
-                                    handleReaction(
-                                        index,
-                                        reactionIndex
-                                    )
-                                }
-                            />
-                        );
+      const isSelected =
+        userReactions[reactionKey];
 
-                    }
-                )}
+      const count =
+        reactionCounts[index]?.[reactionIndex]
+        ?? item.counts?.[reactionIndex]
+        ?? 0;
 
-                <button
-                    className="report-btn"
-                    onClick={() => setShowReportModal(true)}
-                    disabled={reported}
-                >
-                    {reported ? "Reported" : "Report"}
-                </button>
+      return (
+        <ReactionButton
+          key={reactionIndex}
+          emoji={reaction}
+          count={count}
+          selected={isSelected}
+          onClick={() =>
+            handleReaction(
+              index,
+              reactionIndex
+            )
+          }
+        />
+      );
 
-            </div>
+    }
+  )}
+
+  <button
+    className="report-btn"
+    onClick={() =>
+      setShowReportModal(true)
+    }
+    disabled={reported}
+  >
+    {reported
+      ? "Reported"
+      : "Report"}
+  </button>
+
+</div>
 
 
             {/* DIVIDER */}

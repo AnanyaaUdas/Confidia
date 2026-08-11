@@ -44,7 +44,7 @@ const NavBar = () => {
           {isOpen && (
             <div className="dropdownMenu">
               <Link to="/user-login">User Login</Link>
-              <Link to="/admin-login">Admin Login</Link>
+              <Link to="/AdminLogin">Admin Login</Link>
             </div>
           )}
           </div>

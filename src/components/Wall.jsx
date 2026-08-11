@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import ComplimentCard from "./ComplimentCard";
-import Profile from "./ProfilePage";
 import useAppStore from "../store/useAppStore";
 
 const compliments = [
   {
     featured: true,
     to: "COMPUTER SCIENCE DEPARTMENT",
-    message: "Thank you for organizing amazing workshops.",
+    message:
+      "Thank you for organizing amazing workshops.",
     time: "3h ago",
     reactions: ["❤️", "😊", "👏"],
     counts: [28, 16, 4],
@@ -37,7 +37,7 @@ const compliments = [
   {
     to: "A STRANGER IN THE CORRIDOR",
     message:
-      "To the person who helped me carry my books yesterday, thank you. You probably don't know how much that meant.",
+      "To the person who helped me carry my books yesterday, thank you.",
     time: "6h ago",
     reactions: ["❤️", "😊", "👏"],
     counts: [54, 31, 2],
@@ -67,21 +67,33 @@ const compliments = [
 
 const Wall = () => {
   const [openReply, setOpenReply] = useState(1);
-
   const [replyText, setReplyText] = useState("");
 
-  // Which reactions the current user clicked
-const reactionCounts = useAppStore(
-  (state) => state.reactionCounts
-);
-const userReactions = useAppStore(
-  (state) => state.userReactions
-);
-const handleReaction = useAppStore(
-  (state) => state.handleReaction
-);
+  // Zustand
+  const reactionCounts = useAppStore(
+    (state) => state.reactionCounts
+  );
+
+  const userReactions = useAppStore(
+    (state) => state.userReactions
+  );
+
+  const handleReaction = useAppStore(
+    (state) => state.handleReaction
+  );
+
+  const storedCompliments = useAppStore(
+    (state) => state.compliments
+  );
+
+  // Combine default compliments + newly created compliments
+  const allCompliments = [
+    ...compliments,
+    ...storedCompliments,
+  ];
+
   return (
-    <div className="wall-page">
+    <div>
 
       {/* =========================
           PAGE HEADER
@@ -98,24 +110,28 @@ const handleReaction = useAppStore(
 
       {/* =========================
           COMPLIMENT GRID
-          (now using the shared ComplimentCard component)
       ========================= */}
 
       <section className="compliment-grid">
 
-        {compliments.map((item, index) => (
+        {allCompliments.map((item, index) => (
+
           <ComplimentCard
             key={index}
             item={item}
             index={index}
+
             openReply={openReply}
             setOpenReply={setOpenReply}
+
             replyText={replyText}
             setReplyText={setReplyText}
+
             reactionCounts={reactionCounts}
             userReactions={userReactions}
             handleReaction={handleReaction}
           />
+
         ))}
 
       </section>
@@ -135,13 +151,7 @@ const handleReaction = useAppStore(
 
 
       {/* =========================
-          KINDNESS PROFILE
-      ========================= */}
-
-     
-
-      {/* =========================
-          FIXED SHARE BUTTON
+          SHARE BUTTON
       ========================= */}
 
       <button className="wall-share-btn">

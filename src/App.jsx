@@ -4,11 +4,13 @@ import "./style/Wall.css"
 import "./style/Profile.css";
 import "./style/MainWall.css";
 import "./style/Notification.css"
+import "./style/AdminLogin.css"
 
 import Home from "./pages/Home";
 import Wall from "./pages/Wall";
 import Write from "./pages/Write";
 import Profile from "./pages/Profile";
+import AdminLogin from "./pages/AdminLogin";
 
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
         <Route path="/wall" element={<Wall />} />
         <Route path="/write" element={<Write />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/AdminLogin" element={<AdminLogin />} />
       </Routes>
     </BrowserRouter>
     </>
