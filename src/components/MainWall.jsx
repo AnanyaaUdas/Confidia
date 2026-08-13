@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ComplimentCard from "./ComplimentCard";
-import useAppStore from "../store/useAppStore";
 
 const filters = [
     {
@@ -30,84 +29,6 @@ const filters = [
     },
 ];
 
-// =========================
-// EXISTING COMPLIMENTS
-// =========================
-
-const compliments = [
-    {
-        featured: true,
-        emoji: "🌟",
-        to: "COMPUTER SCIENCE DEPARTMENT",
-        message:
-            "Thank you for organizing amazing workshops.",
-        time: "1d ago",
-        category: "college",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [28, 16, 4],
-    },
-
-    {
-        featured: false,
-        emoji: "😊",
-        to: "WHOEVER FOUND MY WALLET",
-        message:
-            "To whoever returned my lost wallet, you're amazing.",
-        time: "1d ago",
-        category: "friends",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [87, 40, 6],
-    },
-
-    {
-        featured: false,
-        emoji: "💙",
-        to: "THE LAB ASSISTANT",
-        message:
-            "You stayed back so we could finish our project. Quiet kindness counts the most.",
-        time: "2d ago",
-        category: "college",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [22, 9, 2],
-    },
-
-    {
-        featured: false,
-        emoji: "🌸",
-        to: "MY BEST FRIEND",
-        message:
-            "Thank you for always listening when I need someone.",
-        time: "3d ago",
-        category: "friends",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [45, 20, 3],
-    },
-
-    {
-        featured: false,
-        emoji: "🎓",
-        to: "DRAMA CLUB",
-        message:
-            "Your last performance was amazing. Please never stop creating.",
-        time: "4d ago",
-        category: "clubs",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [31, 18, 5],
-    },
-
-    {
-        featured: false,
-        emoji: "👩‍🏫",
-        to: "PROF. FROM SEM 3 MATHS",
-        message:
-            "Thank you for explaining the same doubt without making me feel stupid.",
-        time: "5d ago",
-        category: "teacher",
-        reactions: ["❤️", "😊", "👏"],
-        counts: [63, 22, 9],
-    },
-];
-
 const MainWall = () => {
 
     // =========================
@@ -116,6 +37,7 @@ const MainWall = () => {
 
     const [activeFilter, setActiveFilter] =
         useState("everyone");
+
 
     // =========================
     // REPLY
@@ -127,41 +49,62 @@ const MainWall = () => {
     const [replyText, setReplyText] =
         useState("");
 
-    // =========================
-    // GET NEW COMPLIMENTS
-    // FROM ZUSTAND
-    // =========================
-
-    const storedCompliments = useAppStore(
-        (state) => state.compliments
-    );
 
     // =========================
-    // COMBINE OLD + NEW
+    // COMPLIMENTS
     // =========================
 
-    const allCompliments = [
-        ...compliments,
-        ...storedCompliments,
-    ];
+    const [compliments, setCompliments] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
 
     // =========================
-    // REACTION COUNTS
+    // GET COMPLIMENTS
+    // FROM BACKEND
     // =========================
 
-    const [reactionCounts, setReactionCounts] =
-        useState(
-            allCompliments.map((item) => [
-                ...(item.counts || [0, 0, 0]),
-            ])
-        );
+    useEffect(() => {
 
-    // =========================
-    // USER REACTIONS
-    // =========================
+        const fetchCompliments = async () => {
 
-    const [userReactions, setUserReactions] =
-        useState({});
+            try {
+
+                const response = await fetch(
+                    "http://localhost:5000/api/compliments"
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to fetch compliments"
+                    );
+                }
+
+                const data =
+                    await response.json();
+
+                setCompliments(data);
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to fetch compliments:",
+                    error
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
+        fetchCompliments();
+
+    }, []);
+
 
     // =========================
     // FILTER COMPLIMENTS
@@ -169,61 +112,43 @@ const MainWall = () => {
 
     const filteredCompliments =
         activeFilter === "everyone"
-            ? allCompliments
-            : allCompliments.filter(
+            ? compliments
+            : compliments.filter(
                 (item) =>
                     item.category?.toLowerCase() ===
                     activeFilter
             );
 
+
     // =========================
-    // REACTION HANDLER
+    // LOADING
     // =========================
 
-    const handleReaction = (
-        index,
-        reactionIndex
-    ) => {
+    if (loading) {
 
-        const key =
-            `${index}-${reactionIndex}`;
+        return (
+            <section className="wall-page">
 
-        const alreadyReacted =
-            userReactions[key];
+                <div className="wall-header">
 
-        // Update selected reaction
-        setUserReactions((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-        }));
+                    <h1>
+                        Recent compliments
+                    </h1>
 
-        // Update reaction count
-        setReactionCounts((prev) => {
+                    <p>
+                        Loading compliments...
+                    </p>
 
-            const updated = [...prev];
+                </div>
 
-            // Make sure this index exists
-            if (!updated[index]) {
-                updated[index] = [0, 0, 0];
-            }
+            </section>
+        );
+    }
 
-            updated[index] = [
-                ...updated[index],
-            ];
 
-            if (alreadyReacted) {
-                updated[index][reactionIndex] =
-                    Math.max(
-                        0,
-                        updated[index][reactionIndex] - 1
-                    );
-            } else {
-                updated[index][reactionIndex] += 1;
-            }
-
-            return updated;
-        });
-    };
+    // =========================
+    // PAGE
+    // =========================
 
     return (
 
@@ -275,11 +200,13 @@ const MainWall = () => {
                     <button
                         key={filter.value}
                         type="button"
+
                         className={
                             activeFilter === filter.value
                                 ? "filter-btn active"
                                 : "filter-btn"
                         }
+
                         onClick={() =>
                             setActiveFilter(
                                 filter.value
@@ -306,38 +233,42 @@ const MainWall = () => {
 
             <div className="compliment-grid">
 
-                {filteredCompliments.map(
-                    (item, index) => (
+                {filteredCompliments.length === 0 ? (
 
-                        <ComplimentCard
-                            key={index}
-                            item={item}
-                            index={index}
+                    <p className="no-compliments">
+                        No compliments found.
+                    </p>
 
-                            openReply={openReply}
-                            setOpenReply={
-                                setOpenReply
-                            }
+                ) : (
 
-                            replyText={replyText}
-                            setReplyText={
-                                setReplyText
-                            }
+                    filteredCompliments.map(
+                        (item, index) => (
 
-                            reactionCounts={
-                                reactionCounts
-                            }
+                            <ComplimentCard
+                                key={item._id}
+                                item={item}
+                                index={index}
 
-                            userReactions={
-                                userReactions
-                            }
+                                openReply={
+                                    openReply
+                                }
 
-                            handleReaction={
-                                handleReaction
-                            }
-                        />
+                                setOpenReply={
+                                    setOpenReply
+                                }
 
+                                replyText={
+                                    replyText
+                                }
+
+                                setReplyText={
+                                    setReplyText
+                                }
+                            />
+
+                        )
                     )
+
                 )}
 
             </div>

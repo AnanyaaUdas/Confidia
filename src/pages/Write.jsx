@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 import "../style/Write.css";
-import useAppStore from "../store/useAppStore";
 
 const prompts = [
     "Thank someone who helped you this week.",
@@ -72,8 +71,6 @@ const Write = () => {
     const [recipient, setRecipient] = useState("");
     const [message, setMessage] = useState("");
 
-    // IMPORTANT:
-    // Store the filter value, not the label
     const [category, setCategory] =
         useState("everyone");
 
@@ -86,14 +83,8 @@ const Write = () => {
     const [submitted, setSubmitted] =
         useState(false);
 
-
-    // =========================
-    // ZUSTAND
-    // =========================
-
-    const addCompliment = useAppStore(
-        (state) => state.addCompliment
-    );
+    const [loading, setLoading] =
+        useState(false);
 
 
     // =========================
@@ -116,118 +107,70 @@ const Write = () => {
     // SUBMIT
     // =========================
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        e.preventDefault();
+    if (!recipient.trim() || !message.trim()) {
+        alert("Please enter a recipient and a compliment.");
+        return;
+    }
 
-        // Check required fields
-        if (
-            !recipient.trim() ||
-            !message.trim()
-        ) {
-            alert(
-                "Please enter a recipient and a compliment."
-            );
+    setLoading(true);
 
-            return;
-        }
-
-
-        // =========================
-        // CREATE COMPLIMENT
-        // =========================
-
+    try {
         const compliment = {
-
             to: recipient.trim(),
-
             message: message.trim(),
-
-            // This will now be:
-            // everyone / friends / teacher / college / clubs
             category: category,
-
             mood: mood,
-
-            createdAt:
-                new Date().toISOString(),
-
-            time: "Just now",
-
-            reactions: [
-                "❤️",
-                "😊",
-                "👏",
-            ],
-
-            counts: [
-                0,
-                0,
-                0,
-            ],
-
-            emoji: "💗",
         };
 
-
-        // =========================
-        // ADD TO ZUSTAND
-        // =========================
-
-        addCompliment(
-            compliment
+        const response = await fetch(
+            "http://localhost:5000/api/compliments",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(compliment),
+            }
         );
 
+        const data = await response.json();
 
-        // =========================
-        // LOCAL STORAGE
-        // =========================
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to post compliment"
+            );
+        }
 
-        const savedCompliments =
-            JSON.parse(
-                localStorage.getItem(
-                    "confidiaCompliments"
-                )
-            ) || [];
-
-
-        localStorage.setItem(
-            "confidiaCompliments",
-            JSON.stringify([
-                ...savedCompliments,
-                compliment,
-            ])
-        );
-
-
-        // =========================
-        // SUCCESS
-        // =========================
+        console.log("Compliment saved:", data);
 
         setSubmitted(true);
 
-
-        // Clear form
         setRecipient("");
-
         setMessage("");
+        setCategory("everyone");
+        setMood("Grateful");
 
-        setCategory(
-            "everyone"
-        );
-
-        setMood(
-            "Grateful"
-        );
-
-
-        // Hide success message
         setTimeout(() => {
-
             setSubmitted(false);
-
         }, 3000);
-    };
+
+    } catch (error) {
+        console.error(
+            "Error posting compliment:",
+            error
+        );
+
+        alert(
+            "Something went wrong while posting your compliment."
+        );
+
+    } finally {
+        setLoading(false);
+    }
+};
 
 
     return (
@@ -357,7 +300,7 @@ const Write = () => {
 
                     {/* =========================
                         FORM
-                    ======================== */}
+                    ========================= */}
 
                     <form
                         className="confession-form"
@@ -521,15 +464,20 @@ const Write = () => {
                         </div>
 
 
-                        {/*
+                        {/* =========================
                             SUBMIT
-                         */}
+                        ========================= */}
 
                         <button
                             type="submit"
                             className="anonymous-button"
+                            disabled={loading}
                         >
-                            Post anonymously 💌
+
+                            {loading
+                                ? "Posting..."
+                                : "Post anonymously 💌"}
+
                         </button>
 
 
@@ -537,8 +485,8 @@ const Write = () => {
 
                         <p className="privacy-note">
                             Your post stays anonymous.
-                            It's saved locally in your
-                            browser for this demo.
+                            Your compliment is securely stored
+                            in the Confidia database.
                         </p>
 
 
