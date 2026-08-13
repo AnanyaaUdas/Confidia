@@ -57,21 +57,57 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
                                     <div className="admin-stat-card">
-                                        <span>⭐</span>
+                                        <span>🚩</span>
                                         <div>
-                                            <h2>8</h2>
-                                            <p>Featured</p>
+                                            <h2>3</h2>
+                                            <p>Reports</p>
                                         </div>
                                     </div>
                                     <div className="admin-stat-card">
-                                        <span>⭐</span>
+                                        <span>😊</span>
                                         <div>
-                                            <h2>8</h2>
-                                            <p>Featured</p>
+                                            <h2>739</h2>
+                                            <p>Smiles Created</p>
                                         </div>
                                     </div>
                                     
                                 </div>
+                                <section className="admin-section">
+                                    <div className="section-heading">
+                                        <div>
+                                            <h2>Recent Compliments</h2>
+                                            <p>
+                                                Review and mange submitted compliments
+                                            </p>
+                                        </div>
+                                        <button className="view-all-btn">
+                                            View all →
+                                        </button>
+                                    </div>
+                                    <div className="admin-table">
+                                        <div className="table-header">
+                                            <span>Compliment</span>
+                                            <span>Recipient</span>
+                                            <span>Status</span>
+                                            <span>Action</span>
+                                        </div>
+                                        <div className="table-row">
+                                            <div>
+                                                <strong>"Thank you for helping me..."</strong>
+                                                <small>
+                                                    Anonymous. 2h ago
+                                                </small>
+                                            </div>
+                                            <span>
+                                                Computer Department
+                                            </span>
+                                            <span className="status approved">
+                                                Aprroved
+                                            </span>
+                                            <div className="table-action"> </div>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
                         </main>
                      </nav>
