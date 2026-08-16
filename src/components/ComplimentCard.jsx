@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactionButton from "./ReactionButton";
+import useAppStore from "../store/useAppStore";
 
 const ComplimentCard = ({
     item,
@@ -36,6 +37,8 @@ const ComplimentCard = ({
     const [selectedReaction, setSelectedReaction] =
         useState(null);
 
+    const addReaction = useAppStore((state) => state.addReaction);
+
 
     const reactionList = [
         {
@@ -59,74 +62,70 @@ const ComplimentCard = ({
 
     const handleReaction = async (reactionName) => {
 
-        // Prevent multiple clicks
-        // on the same reaction
+    if (selectedReaction === reactionName) {
+        return;
+    }
 
-        if (selectedReaction === reactionName) {
-            return;
-        }
+    // Only the FIRST reaction on a card counts toward the
+    // user's own "reactions given" stat — switching your pick
+    // on the same card shouldn't inflate the count.
+    const isFirstReactionOnCard = selectedReaction === null;
 
+    // Default/demo cards don't have MongoDB IDs
+    if (!item._id || item._id.startsWith("default-")) {
+        console.log("This is a default card, not stored in MongoDB.");
+        return;
+    }
 
-        try {
+    try {
 
-            const response = await fetch(
-                `http://localhost:5000/api/compliments/${item._id}/reaction`,
-                {
-                    method: "PATCH",
+        const response = await fetch(
+            `http://localhost:5000/api/compliments/${item._id}/reaction`,
+            {
+                method: "PATCH",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
+                headers: {
+                    "Content-Type": "application/json",
+                },
 
-                    body: JSON.stringify({
-                        reaction: reactionName,
-                    }),
-                }
-            );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.message ||
-                    "Failed to add reaction"
-                );
-
+                body: JSON.stringify({
+                    reaction: reactionName,
+                }),
             }
+        );
 
+        const data = await response.json();
 
-            // =========================
-            // UPDATE REACTIONS
-            // =========================
-
-            setReactions(
-                data.reactions
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to add reaction"
             );
-
-
-            // =========================
-            // MARK AS SELECTED
-            // =========================
-
-            setSelectedReaction(
-                reactionName
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Reaction error:",
-                error
-            );
-
         }
-    };
+
+        // Update all three counts
+        setReactions({
+            heart: data.reactions.heart,
+            smile: data.reactions.smile,
+            clap: data.reactions.clap,
+        });
+
+        setSelectedReaction(reactionName);
+
+        if (isFirstReactionOnCard) {
+            // Update the user's own stats (Campus Hero badge,
+            // Kindness Streak, celebration popup, etc.)
+            addReaction();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Reaction error:",
+            error
+        );
+
+    }
+};
 
 
     // =========================

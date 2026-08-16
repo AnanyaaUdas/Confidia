@@ -1,12 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import logo from "../assets/Images/logo.png";
 import NotificationBell from "./NotificationBell";
+import useAppStore from "../store/useAppStore";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+  const User = useAppStore((state) => state.User);
+  const logout = useAppStore((state) => state.logout)
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+
+    // Remove logged-in user
+    localStorage.removeItem("confidiaUser");
+
+    // Remove login status
+    localStorage.removeItem("isLoggedIn");
+
+    // Clear the logged-in user's data from the app state
+    // (compliments count, badges progress, etc.)
+    logout();
+
+    // Close the dropdown if it was open
+    setIsOpen(false);
+
+    // Go back to Home
+    navigate("/");
+};
   return (
     <div className="header">
       <div className="headerList">
@@ -38,13 +61,21 @@ const NavBar = () => {
             className="login-btn"
             onClick={() => setIsOpen(!isOpen)}
             >
-            Login
+            {isLoggedIn ? (User.firstName || User.username || "Account") : "Login"}
           </button>
 
           {isOpen && (
             <div className="dropdownMenu">
-              <Link to="/user-login">User Login</Link>
-              <Link to="/AdminLogin">Admin Login</Link>
+              {isLoggedIn ? (
+                <button type="button" onClick={handleLogout}>
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link to="/Auth" onClick={() => setIsOpen(false)}>User Login</Link>
+                  <Link to="/AdminLogin" onClick={() => setIsOpen(false)}>Admin Login</Link>
+                </>
+              )}
             </div>
           )}
           </div>

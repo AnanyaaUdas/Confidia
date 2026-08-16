@@ -39,12 +39,12 @@ const Badges = () => {
         <div className="welcome-card">
            
           <div className="welcome-avatar">
-            {User.name.charAt(0)}
+            {User.username.charAt(0)}
           </div>
 
           <div className="welcome-info">
 
-            <h3>{User.name}</h3>
+            <h3>{User.username}</h3>
 
             <span className="welcome-since">
               Member since {User.memberSince}

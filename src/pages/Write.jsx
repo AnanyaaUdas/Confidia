@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
+import useAppStore from "../store/useAppStore";
 import "../style/Write.css";
 
 const prompts = [
@@ -65,6 +67,13 @@ const moods = [
 const Write = () => {
 
     // =========================
+    // AUTH CHECK
+    // =========================
+
+    const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+    const addCompliment = useAppStore((state) => state.addCompliment);
+
+    // =========================
     // FORM STATES
     // =========================
 
@@ -110,6 +119,11 @@ const Write = () => {
     const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isLoggedIn) {
+        alert("Please log in to post a compliment.");
+        return;
+    }
+
     if (!recipient.trim() || !message.trim()) {
         alert("Please enter a recipient and a compliment.");
         return;
@@ -145,6 +159,11 @@ const Write = () => {
         }
 
         console.log("Compliment saved:", data);
+
+        // Update local stats (badges, streak, profile counters).
+        // Store figures out if this just unlocked a badge and
+        // pops the celebration for us.
+        addCompliment(compliment);
 
         setSubmitted(true);
 
@@ -299,8 +318,27 @@ const Write = () => {
 
 
                     {/* =========================
-                        FORM
+                        FORM (logged-in users only)
                     ========================= */}
+
+                    {!isLoggedIn ? (
+
+                        <div className="confession-form write-locked">
+
+                            <h3>You need to be logged in to write a compliment</h3>
+
+                            <p>
+                                Create an account or log in so we can
+                                keep track of your kindness stats and badges.
+                            </p>
+
+                            <Link to="/Auth" className="anonymous-button write-login-link">
+                                Login / Register
+                            </Link>
+
+                        </div>
+
+                    ) : (
 
                     <form
                         className="confession-form"
@@ -504,6 +542,8 @@ const Write = () => {
                         )}
 
                     </form>
+
+                    )}
 
                 </section>
 

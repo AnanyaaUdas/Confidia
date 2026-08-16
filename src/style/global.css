@@ -160,7 +160,6 @@ body {
     transform:translateY(-2px);
     box-shadow:0 12px 28px rgba(123,97,255,.35);
 }
-
 .dropdownMenu{
     position:absolute;
     top:60px;
@@ -173,16 +172,25 @@ body {
     z-index:100;
 }
 
-.dropdownMenu a{
+.dropdownMenu a,
+.dropdownMenu button{
     display:block;
+    width:100%;
     padding:15px 20px;
     text-decoration:none;
     color:#333;
     font-weight:500;
     transition:.3s;
+    background:none;
+    border:none;
+    text-align:left;
+    font-size:15px;
+    font-family:inherit;
+    cursor:pointer;
 }
 
-.dropdownMenu a:hover{
+.dropdownMenu a:hover,
+.dropdownMenu button:hover{
     background:#F5F2FF;
     color:#7B61FF;
 }
@@ -936,4 +944,113 @@ body {
     display: flex;
     align-items: center;
     gap: 18px;
+}
+/* =====================================================
+   BADGE CELEBRATION POPUP
+===================================================== */
+
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(56, 52, 90, 0.35);
+  backdrop-filter: blur(4px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+
+  animation: celebrationFadeIn 0.2s ease;
+}
+
+.celebration-modal {
+  width: 340px;
+
+  background: white;
+
+  border-radius: 26px;
+
+  padding: 34px 28px 28px;
+
+  text-align: center;
+
+  box-shadow: 0 25px 60px rgba(94, 71, 145, 0.25);
+
+  animation: celebrationPopIn 0.35s ease;
+}
+
+.celebration-confetti {
+  font-size: 20px;
+  letter-spacing: 6px;
+  margin-bottom: 6px;
+  animation: celebrationBounce 1.2s ease infinite;
+}
+
+.celebration-icon {
+  width: 64px;
+  height: 64px;
+
+  margin: 8px auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 32px;
+
+  border-radius: 18px;
+
+  background: linear-gradient(135deg, #fff1f8, #f3edff);
+}
+
+.celebration-modal h3 {
+  margin: 0 0 6px;
+  color: #3d365c;
+  font-size: 22px;
+}
+
+.celebration-title {
+  margin: 0 0 10px;
+  color: #ff6da8;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.celebration-desc {
+  margin: 0 0 22px;
+  color: #948aad;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+@keyframes celebrationFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes celebrationPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes celebrationBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
