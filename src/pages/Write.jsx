@@ -4,11 +4,56 @@ import Footer from "../components/Footer";
 import "../style/Write.css";
 
 const prompts = [
-  "Thank someone who helped you this week.",
-  "Compliment someone who made your day better.",
-  "Thank a teacher who inspired you.",
-  "Appreciate someone who always makes people smile.",
-  "Write something kind to someone who deserves to hear it."
+  "Thank someone who helped you this week. 💛",
+  "Compliment someone who made your day better. 😊",
+  "Appreciate someone who always supports you. 🫶",
+  "Thank someone who always has your back. 🤝",
+  "Compliment someone who deserves to hear it. ✨",
+  "Appreciate someone who brings positivity into your life. 🌟",
+  "Thank someone who made you smile recently. 😄",
+  "Tell someone what you admire about them. 💫",
+  "Appreciate someone who always makes people feel welcome. 🫂",
+  "Thank someone who believed in you. 🙏",
+  "Compliment someone on their personality. 🌷",
+  "Appreciate someone who makes your days brighter. ☀️",
+  "Thank someone for a memory you cherish. 💖",
+  "Tell someone why you’re glad to know them. 🌸",
+  "Compliment someone you’ve been meaning to praise. 💌",
+  "Appreciate someone who makes ordinary moments special. ✨",
+  "Thank someone who is always there for you. 🤍",
+  "Tell someone what makes them special. 💎",
+  "Appreciate someone who brings great energy. ⚡",
+  "Compliment someone who always makes you laugh. 😂",
+  "Thank someone who helped you when you needed it. 🙌",
+  "Encourage someone who may need a little motivation. 🌱",
+  "Appreciate someone who makes everyone feel included. 🫶",
+  "Tell someone they made you smile today. 😊",
+  "Give someone the recognition they deserve. 🏆",
+  "Tell someone one quality you truly admire. 💫",
+  "Thank someone who makes your day brighter. 🌞",
+  "Appreciate someone for simply being there. 💛",
+  "Compliment someone you don’t usually talk to. 💬",
+  "Tell someone why you enjoy their company. 🌷",
+  "Appreciate someone who makes difficult days easier. 🤍",
+  "Thank someone who has positively influenced you. 🌟",
+  "Give a shoutout to someone you’re grateful for. 🙌",
+  "Tell someone what they bring to your friendship. ✨",
+  "Appreciate someone you can always count on. 🤝",
+  "Thank someone who always makes you laugh. 😂",
+  "Tell someone something kind they deserve to hear. 💌",
+  "Appreciate someone who motivates you. 🚀",
+  "Tell someone who makes you feel comfortable being yourself. 🫶",
+  "Thank someone for making a moment memorable. 💖",
+  "Tell someone what you value most about them. 💎",
+  "Appreciate someone whose kindness goes unnoticed. 🌼",
+  "Thank someone who makes simple moments more fun. 🎉",
+  "Give someone a genuine confidence boost. 💪",
+  "Tell someone they’re more appreciated than they realize. 💛",
+  "Appreciate someone who has made a difference in your life. 🌈",
+  "Thank someone who never gave up on you. 🙏",
+  "Give a shoutout to someone who deserves appreciation. 🌟",
+  "Tell someone one thing you’ll always appreciate about them. 💖",
+  "Write something kind to someone who deserves to hear it. 💌"
 ];
 
 const categories = [
@@ -159,9 +204,8 @@ const Write = () => {
                   <button
                     type="button"
                     key={item.label}
-                    className={`option-button ${
-                      category === item.label ? "selected" : ""
-                    }`}
+                    className={`option-button ${category === item.label ? "selected" : ""
+                      }`}
                     onClick={() => setCategory(item.label)}
                   >
                     <span>{item.icon}</span>
@@ -194,9 +238,8 @@ const Write = () => {
                   <button
                     type="button"
                     key={item.label}
-                    className={`option-button ${
-                      mood === item.label ? "selected" : ""
-                    }`}
+                    className={`option-button ${mood === item.label ? "selected" : ""
+                      }`}
                     onClick={() => setMood(item.label)}
                   >
                     <span>{item.icon}</span>
