@@ -1,16 +1,75 @@
-# React + Vite
+# 💗 Confidia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Confidia is an anonymous platform for college students to share compliments, appreciation, and positive messages with people in their college community.
 
-Currently, two official plugins are available:
+The goal of Confidia is to create a safe and positive digital space where students can appreciate others without feeling pressured to reveal their identity.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- 💌 **Anonymous Compliments**  
+  Write and share compliments without revealing your identity.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🌸 **Kindness Wall**  
+  View positive messages shared by students.
 
-## Expanding the ESLint configuration
+- 🎯 **Kindness Prompts**  
+  Get random prompts to help you think of something kind to say.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🎲 **Kindness Wheel**  
+  Generate a random kindness prompt whenever you need inspiration.
+
+- 🏷️ **Categories**  
+  Organize compliments into categories such as:
+  - Everyone
+  - Friends
+  - Teachers
+  - College
+  - Clubs
+
+- 😊 **Mood Selection**  
+  Choose the mood behind your compliment, such as:
+  - Grateful
+  - Happy
+  - Inspired
+  - Proud
+  - Appreciative
+
+- 💌 **Anonymous Replies**  
+  Recipients can respond to compliments anonymously.
+
+- 🚨 **Moderation & Reporting**  
+  Content can be reported for review to help maintain a positive environment.
+
+- 📱 **Responsive Design**  
+  The interface is designed to work across desktop, tablet, and mobile devices.
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- React
+- JavaScript
+- HTML5
+- CSS3
+- Vite
+- React Router
+
+### Backend
+
+- Node.js
+- Express.js
+
+### Database
+
+- MongoDB
+
+### Data & Storage
+
+- LocalStorage
+
+### Development Tools
+
+- Git
+- GitHub
+- VS Code
+- npm
