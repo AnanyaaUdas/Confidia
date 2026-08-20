@@ -1,10 +1,11 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 
-// =====================================
+
 // GENERATE ANONYMOUS USERNAME
-// =====================================
+
 
 const generateUsername = async () => {
 
@@ -75,9 +76,9 @@ const generateUsername = async () => {
 };
 
 
-// =====================================
+
 // REGISTER
-// =====================================
+
 
 const registerUser = async (req, res) => {
 
@@ -190,9 +191,9 @@ const registerUser = async (req, res) => {
 };
 
 
-// =====================================
+
 // LOGIN
-// =====================================
+
 
 const loginUser = async (req, res) => {
 
@@ -241,6 +242,15 @@ const loginUser = async (req, res) => {
             });
 
         }
+        const token = jwt.sign(
+            {
+                id: user._id,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d",
+            }
+        );
 
 
         // Successful login
@@ -248,6 +258,7 @@ const loginUser = async (req, res) => {
 
             message:
                 "Login successful",
+                token,
 
             user: {
 

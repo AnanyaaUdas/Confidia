@@ -1,8 +1,7 @@
 import { create } from "zustand";
 
-// =========================
 // DAY STREAK HELPER
-// =========================
+
 // Any "kindness action" (writing a compliment, reacting to one)
 // counts as being active today. If the person was also active
 // yesterday, the streak grows; if they skipped a day, it resets.
@@ -33,13 +32,65 @@ const bumpStreak = (currentStreak) => {
     return 1;
 };
 
+// REHYDRATE ON LOAD
+//
+// Login.jsx / Register.jsx already save the logged-in user to
+// localStorage ("confidiaUser" / "isLoggedIn"), but nothing ever
+// read it back — so a page refresh silently logged everyone out
+// even though the data was sitting right there. This restores it
+// once, when the store is first created.
+
+const emptyUser = {
+    _id: "",
+    username: "",
+    firstName: "",
+    lastName: "",
+    memberSince: "",
+    complimentsShared: 0,
+    reactionsGiven: 0,
+    dayStreak: 0,
+};
+
+const buildUser = (user) => ({
+    _id: user._id || user.id || "",
+    username: user.username || "",
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    memberSince: user.memberSince || "",
+    complimentsShared: user.complimentsShared || 0,
+    reactionsGiven: user.reactionsGiven || 0,
+    dayStreak: user.dayStreak || 0,
+});
+
+const getStoredUser = () => {
+    try {
+        const raw = localStorage.getItem("confidiaUser");
+        const wasLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+        if (!raw || !wasLoggedIn) {
+            return { User: emptyUser, isLoggedIn: false };
+        }
+
+        return {
+            User: buildUser(JSON.parse(raw)),
+            isLoggedIn: true,
+        };
+
+    } catch (error) {
+        // Corrupted/old localStorage value — don't crash the app,
+        // just start logged out.
+        console.error("Failed to restore saved session:", error);
+        return { User: emptyUser, isLoggedIn: false };
+    }
+};
+
 const useAppStore = create((set) => ({
 
-    // =========================
+  
     // LOGIN / USER
-    // =========================
+   
 
-    isLoggedIn: false,
+    ...getStoredUser(),
 
     isAdmin: false,
 
@@ -54,95 +105,39 @@ const useAppStore = create((set) => ({
             isLoggedIn: !state.isLoggedIn,
         })),
 
-    User: {
 
-        username: "",
-
-        firstName: "",
-
-        lastName: "",
-
-        memberSince: "",
-
-        complimentsShared: 0,
-
-        reactionsGiven: 0,
-
-        dayStreak: 0,
-
-    },
-
-
-    // =========================
     // SET LOGGED-IN USER
-    // =========================
+    // NOTE: _id is kept here (it used to be dropped), because the
+    // notification bell, replies, and reactions all need the
+    // logged-in user's real database id to talk to the backend.
 
     setUser: (user) =>
         set({
 
-            User: {
-
-                username:
-                    user.username || "",
-
-                firstName:
-                    user.firstName || "",
-
-                lastName:
-                    user.lastName || "",
-
-                memberSince:
-                    user.memberSince || "",
-
-                complimentsShared:
-                    user.complimentsShared || 0,
-
-                reactionsGiven:
-                    user.reactionsGiven || 0,
-
-                dayStreak:
-                    user.dayStreak || 0,
-
-            },
+            User: buildUser(user),
 
             isLoggedIn: true,
 
         }),
 
 
-    // =========================
+
     // LOGOUT
-    // =========================
+  
 
     logout: () =>
         set({
 
             isLoggedIn: false,
 
-            User: {
-
-                username: "",
-
-                firstName: "",
-
-                lastName: "",
-
-                memberSince: "",
-
-                complimentsShared: 0,
-
-                reactionsGiven: 0,
-
-                dayStreak: 0,
-
-            },
+            User: emptyUser,
 
         }),
 
 
-    // =========================
+  
     // BADGES
-    // =========================
+
 
     badges: [
 
@@ -181,9 +176,9 @@ const useAppStore = create((set) => ({
     ],
 
 
-    // =========================
+  
     // BADGE CELEBRATION POPUP
-    // =========================
+   
     // Whichever component just unlocked a badge (Write, or a
     // reaction on the Wall) drops it here; BadgeCelebration.jsx
     // renders it once, app-wide.
@@ -197,9 +192,9 @@ const useAppStore = create((set) => ({
         set({ celebration: null }),
 
 
-    // =========================
+  
     // COMPLIMENTS
-    // =========================
+   
 
     compliments: [],
 
@@ -263,9 +258,9 @@ const useAppStore = create((set) => ({
         }),
 
 
-    // =========================
+    
     // REACTIONS GIVEN (own stats)
-    // =========================
+ 
     // Called whenever the user reacts to someone else's
     // compliment on the Wall — separate from the demo
     // reaction-count toggler further down.
@@ -310,9 +305,9 @@ const useAppStore = create((set) => ({
         }),
 
 
-    // =========================
+   
     // REACTIONS
-    // =========================
+    
 
     userReactions: {},
 

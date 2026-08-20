@@ -14,54 +14,19 @@ const prompts = [
 ];
 
 const categories = [
-    {
-        label: "Everyone",
-        icon: "🌸",
-        value: "everyone",
-    },
-    {
-        label: "Friends",
-        icon: "💗",
-        value: "friends",
-    },
-    {
-        label: "Teachers",
-        icon: "🧑‍🏫",
-        value: "teacher",
-    },
-    {
-        label: "College",
-        icon: "🏫",
-        value: "college",
-    },
-    {
-        label: "Clubs",
-        icon: "🎓",
-        value: "clubs",
-    },
+    { label: "Everyone", icon: "🌸", value: "everyone" },
+    { label: "Friends", icon: "💗", value: "friends" },
+    { label: "Teachers", icon: "🧑‍🏫", value: "teacher" },
+    { label: "College", icon: "🏫", value: "college" },
+    { label: "Clubs", icon: "🎓", value: "clubs" },
 ];
 
 const moods = [
-    {
-        label: "Grateful",
-        icon: "🥰",
-    },
-    {
-        label: "Happy",
-        icon: "😊",
-    },
-    {
-        label: "Inspired",
-        icon: "🌟",
-    },
-    {
-        label: "Proud",
-        icon: "👏",
-    },
-    {
-        label: "Appreciative",
-        icon: "💙",
-    },
+    { label: "Grateful", icon: "🥰" },
+    { label: "Happy", icon: "😊" },
+    { label: "Inspired", icon: "🌟" },
+    { label: "Proud", icon: "👏" },
+    { label: "Appreciative", icon: "💙" },
 ];
 
 const Write = () => {
@@ -72,6 +37,7 @@ const Write = () => {
 
     const isLoggedIn = useAppStore((state) => state.isLoggedIn);
     const addCompliment = useAppStore((state) => state.addCompliment);
+    const User = useAppStore((state) => state.User);
 
     // =========================
     // FORM STATES
@@ -79,21 +45,11 @@ const Write = () => {
 
     const [recipient, setRecipient] = useState("");
     const [message, setMessage] = useState("");
-
-    const [category, setCategory] =
-        useState("everyone");
-
-    const [mood, setMood] =
-        useState("Grateful");
-
-    const [prompt, setPrompt] =
-        useState(prompts[0]);
-
-    const [submitted, setSubmitted] =
-        useState(false);
-
-    const [loading, setLoading] =
-        useState(false);
+    const [category, setCategory] = useState("everyone");
+    const [mood, setMood] = useState("Grateful");
+    const [prompt, setPrompt] = useState(prompts[0]);
+    const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
 
     // =========================
@@ -101,14 +57,8 @@ const Write = () => {
     // =========================
 
     const spinWheel = () => {
-
-        const randomIndex = Math.floor(
-            Math.random() * prompts.length
-        );
-
-        setPrompt(
-            prompts[randomIndex]
-        );
+        const randomIndex = Math.floor(Math.random() * prompts.length);
+        setPrompt(prompts[randomIndex]);
     };
 
 
@@ -117,144 +67,100 @@ const Write = () => {
     // =========================
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (!isLoggedIn) {
-        alert("Please log in to post a compliment.");
-        return;
-    }
-
-    if (!recipient.trim() || !message.trim()) {
-        alert("Please enter a recipient and a compliment.");
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        const compliment = {
-            to: recipient.trim(),
-            message: message.trim(),
-            category: category,
-            mood: mood,
-        };
-
-        const response = await fetch(
-            "http://localhost:5000/api/compliments",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(compliment),
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.message || "Failed to post compliment"
-            );
+        if (!isLoggedIn) {
+            alert("Please log in to post a compliment.");
+            return;
         }
 
-        console.log("Compliment saved:", data);
+        if (!recipient.trim() || !message.trim()) {
+            alert("Please enter a recipient and a compliment.");
+            return;
+        }
 
-        // Update local stats (badges, streak, profile counters).
-        // Store figures out if this just unlocked a badge and
-        // pops the celebration for us.
-        addCompliment(compliment);
+        setLoading(true);
 
-        setSubmitted(true);
+        try {
+            const compliment = {
+                to: recipient.trim(),
+                message: message.trim(),
+                category: category,
+                mood: mood,
+                // Who posted it — the backend needs this so it can
+                // notify the right person later when someone reacts
+                // to or replies to this compliment.
+                createdBy: User._id || null,
+            };
 
-        setRecipient("");
-        setMessage("");
-        setCategory("everyone");
-        setMood("Grateful");
+            const response = await fetch(
+                "http://localhost:5000/api/compliments",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(compliment),
+                }
+            );
 
-        setTimeout(() => {
-            setSubmitted(false);
-        }, 3000);
+            const data = await response.json();
 
-    } catch (error) {
-        console.error(
-            "Error posting compliment:",
-            error
-        );
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to post compliment"
+                );
+            }
 
-        alert(
-            "Something went wrong while posting your compliment."
-        );
+            console.log("Compliment saved:", data);
 
-    } finally {
-        setLoading(false);
-    }
-};
+            // Update local stats (badges, streak, profile counters).
+            // Store figures out if this just unlocked a badge and
+            // pops the celebration for us.
+            addCompliment(compliment);
+
+            setSubmitted(true);
+
+            setRecipient("");
+            setMessage("");
+            setCategory("everyone");
+            setMood("Grateful");
+
+            setTimeout(() => {
+                setSubmitted(false);
+            }, 3000);
+
+        } catch (error) {
+            console.error("Error posting compliment:", error);
+            alert("Something went wrong while posting your compliment.");
+
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
         <>
-
-            {/* =========================
-                NAVBAR
-            ========================= */}
-
             <NavBar />
-
-
-            {/* =========================
-                MAIN WRITE PAGE
-            ========================= */}
 
             <main className="write-page">
 
-
-                {/* =========================
-                    INTRO
-                ========================= */}
-
                 <div className="write-intro">
-
-                    <h1>
-                        Write a compliment
-                    </h1>
-
+                    <h1>Write a compliment</h1>
                     <p>
                         Nobody will ever see your name.
                         Only the messages pass moderation.
                     </p>
-
                 </div>
-
-
-                {/* =========================
-                    WRITE LAYOUT
-                ========================= */}
 
                 <section className="write-layout">
 
-
-                    {/* =========================
-                        LEFT SIDE
-                    ========================= */}
-
                     <div className="write-left">
 
-
-                        {/* RANDOM PROMPT */}
-
                         <div className="kindness-prompt">
-
-                            <p>
-                                <b>
-                                    🎯 RANDOM KINDNESS PROMPT
-                                </b>
-                            </p>
-
-                            <h2>
-                                {prompt}
-                            </h2>
-
+                            <p><b>🎯 RANDOM KINDNESS PROMPT</b></p>
+                            <h2>{prompt}</h2>
                             <button
                                 type="button"
                                 className="wheel-button"
@@ -262,264 +168,122 @@ const Write = () => {
                             >
                                 🎲 Spin the Kindness Wheel
                             </button>
-
                         </div>
-
-
-                        {/* INFO CARDS */}
 
                         <div className="info-cards">
 
-
-                            {/* SECRET REPLY */}
-
                             <div className="info-card">
-
-                                <div className="info-icon">
-                                    💌
-                                </div>
-
-                                <h3>
-                                    Secret reply
-                                </h3>
-
+                                <div className="info-icon">💌</div>
+                                <h3>Secret reply</h3>
                                 <p>
                                     Recipients can post an
-                                    anonymous thank-you
-                                    underneath.
+                                    anonymous thank-you underneath.
                                 </p>
-
                             </div>
 
-
-                            {/* MODERATION */}
-
                             <div className="info-card">
-
-                                <div className="info-icon">
-                                    🚨
-                                </div>
-
-                                <h3>
-                                    Gentle moderation
-                                </h3>
-
+                                <div className="info-icon">🚨</div>
+                                <h3>Gentle moderation</h3>
                                 <p>
                                     Report a post and an admin
-                                    reviews it — kindness stays
-                                    kind.
+                                    reviews it — kindness stays kind.
                                 </p>
-
                             </div>
 
                         </div>
 
                     </div>
 
-
-                    {/* =========================
-                        FORM (logged-in users only)
-                    ========================= */}
-
                     {!isLoggedIn ? (
 
                         <div className="confession-form write-locked">
-
                             <h3>You need to be logged in to write a compliment</h3>
-
                             <p>
                                 Create an account or log in so we can
                                 keep track of your kindness stats and badges.
                             </p>
-
                             <Link to="/Auth" className="anonymous-button write-login-link">
                                 Login / Register
                             </Link>
-
                         </div>
 
                     ) : (
 
-                    <form
-                        className="confession-form"
-                        onSubmit={handleSubmit}
-                    >
-
-
-                        {/* =========================
-                            RECIPIENT
-                        ========================= */}
+                    <form className="confession-form" onSubmit={handleSubmit}>
 
                         <div className="form-group">
-
-                            <h4>
-                                Recipient
-                            </h4>
-
-                            <span>
-                                To:
-                            </span>
-
+                            <h4>Recipient</h4>
+                            <span>To:</span>
                             <input
                                 type="text"
                                 value={recipient}
-                                onChange={(e) =>
-                                    setRecipient(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setRecipient(e.target.value)}
                                 placeholder="A stranger in the corridor, Prof. Sharma, Drama Club..."
                             />
-
                         </div>
 
-
-                        {/* =========================
-                            CATEGORY
-                        ========================= */}
-
                         <div className="form-group">
-
-                            <h4>
-                                Category
-                            </h4>
-
+                            <h4>Category</h4>
                             <p className="form-category">
-                                Where should this show up
-                                on the wall?
+                                Where should this show up on the wall?
                             </p>
 
-
                             <div className="option-list">
-
-                                {categories.map(
-                                    (item) => (
-
-                                        <button
-                                            type="button"
-                                            key={item.value}
-                                            className={`option-button ${
-                                                category ===
-                                                item.value
-                                                    ? "selected"
-                                                    : ""
-                                            }`}
-                                            onClick={() =>
-                                                setCategory(
-                                                    item.value
-                                                )
-                                            }
-                                        >
-
-                                            <span>
-                                                {item.icon}
-                                            </span>
-
-                                            {item.label}
-
-                                        </button>
-
-                                    )
-                                )}
-
+                                {categories.map((item) => (
+                                    <button
+                                        type="button"
+                                        key={item.value}
+                                        className={`option-button ${
+                                            category === item.value ? "selected" : ""
+                                        }`}
+                                        onClick={() => setCategory(item.value)}
+                                    >
+                                        <span>{item.icon}</span>
+                                        {item.label}
+                                    </button>
+                                ))}
                             </div>
-
                         </div>
 
-
-                        {/* =========================
-                            MESSAGE
-                        ========================= */}
-
                         <div className="form-group">
-
-                            <h4>
-                                Message
-                            </h4>
-
+                            <h4>Message</h4>
                             <textarea
                                 value={message}
-                                onChange={(e) =>
-                                    setMessage(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setMessage(e.target.value)}
                                 placeholder="To the person who helped me carry my books yesterday..."
                                 maxLength={240}
                             />
-
                             <div className="character-count">
                                 {message.length}/240
                             </div>
-
                         </div>
-
-
-                        {/* =========================
-                            MOOD
-                        ========================= */}
 
                         <div className="form-group">
-
-                            <h4>
-                                Mood
-                            </h4>
-
+                            <h4>Mood</h4>
                             <div className="option-list">
-
-                                {moods.map(
-                                    (item) => (
-
-                                        <button
-                                            type="button"
-                                            key={item.label}
-                                            className={`option-button ${
-                                                mood ===
-                                                item.label
-                                                    ? "selected"
-                                                    : ""
-                                            }`}
-                                            onClick={() =>
-                                                setMood(
-                                                    item.label
-                                                )
-                                            }
-                                        >
-
-                                            <span>
-                                                {item.icon}
-                                            </span>
-
-                                            {item.label}
-
-                                        </button>
-
-                                    )
-                                )}
-
+                                {moods.map((item) => (
+                                    <button
+                                        type="button"
+                                        key={item.label}
+                                        className={`option-button ${
+                                            mood === item.label ? "selected" : ""
+                                        }`}
+                                        onClick={() => setMood(item.label)}
+                                    >
+                                        <span>{item.icon}</span>
+                                        {item.label}
+                                    </button>
+                                ))}
                             </div>
-
                         </div>
-
-
-                        {/* =========================
-                            SUBMIT
-                        ========================= */}
 
                         <button
                             type="submit"
                             className="anonymous-button"
                             disabled={loading}
                         >
-
-                            {loading
-                                ? "Posting..."
-                                : "Post anonymously 💌"}
-
+                            {loading ? "Posting..." : "Post anonymously 💌"}
                         </button>
-
-
-                        {/* PRIVACY */}
 
                         <p className="privacy-note">
                             Your post stays anonymous.
@@ -527,18 +291,11 @@ const Write = () => {
                             in the Confidia database.
                         </p>
 
-
-                        {/* SUCCESS */}
-
                         {submitted && (
-
                             <div className="success-message">
-
                                 💗 Your kindness has been
                                 posted anonymously!
-
                             </div>
-
                         )}
 
                     </form>
@@ -548,11 +305,6 @@ const Write = () => {
                 </section>
 
             </main>
-
-
-            {/* =========================
-                FOOTER
-            ========================= */}
 
             <Footer />
 

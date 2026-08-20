@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
             default: 0,
         },
 
-        reactionGiven: {
+        reactionsGiven: {
             type: Number,
             default: 0,
         },

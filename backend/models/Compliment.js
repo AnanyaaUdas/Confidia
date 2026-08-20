@@ -26,6 +26,11 @@ const complimentSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
 
         reactions: {
             heart: {
@@ -43,7 +48,34 @@ const complimentSchema = new mongoose.Schema(
                 default: 0,
             },
         },
+        replies: [
+    {
+        text: {
+            type: String,
+            required: true,
+        },
+
+        repliedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: false,
+        },
+
+        // The user this reply is directed to
+        repliedTo: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: false,
+        },
+
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
+],
+    },
+    
     {
         timestamps: true,
     }

@@ -59,6 +59,7 @@ const MainWall = () => {
 
     const [loading, setLoading] =
         useState(true);
+    const [searchKeyword,setSearchKeyword] = useState("");
 
 
     // =========================
@@ -104,6 +105,21 @@ const MainWall = () => {
         fetchCompliments();
 
     }, []);
+    const handleSearch = async(keyword) => {
+        setSearchKeyword(keyword);
+        try{
+            const response = await fetch(
+                `http://localhost:5000/api/compliments/search?keyword=${encodeURIComponent(keyword)}`
+            );
+            if (!response.ok) {
+                throw new Error("Failed to search compliments");
+            }
+            const data = await response.json();
+            setCompliments(data);
+        } catch (error){
+            console.error("search failed",error);
+        }
+    }
 
 
     // =========================
@@ -184,6 +200,8 @@ const MainWall = () => {
                 <input
                     type="text"
                     placeholder='Search "Computer Department"...'
+                    value={searchKeyword}
+                    onChange={(e)=> handleSearch(e.target.value)}
                 />
 
             </div>

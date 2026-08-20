@@ -63,3 +63,7 @@ app.listen(PORT, () => {
     );
 
 });
+
+const notificationRoutes = require("./routes/NotificationRoutes");
+
+app.use("/api/notifications", notificationRoutes);
