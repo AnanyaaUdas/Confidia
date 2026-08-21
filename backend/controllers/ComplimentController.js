@@ -63,40 +63,37 @@ const searchCompliments = async (req, res) => {
             const compliments = await Compliment.find()
                 .sort({ createdAt: -1 });
 
-            return res.status(200).json(
-                compliments
-            );
+            return res.status(200).json(compliments);
         }
 
-        const compliments =
-            await Compliment.find({
-                $or: [
-                    {
-                        to: {
-                            $regex: keyword,
-                            $options: "i",
-                        },
+        const compliments = await Compliment.find({
+            $or: [
+                {
+                    to: {
+                        $regex: keyword,
+                        $options: "i",
                     },
-                    {
-                        message: {
-                            $regex: keyword,
-                            $options: "i",
-                        },
+                },
+                {
+                    message: {
+                        $regex: keyword,
+                        $options: "i",
                     },
-                    {
-                        category: {
-                            $regex: keyword,
-                            $options: "i",
-                        },
+                },
+                {
+                    category: {
+                        $regex: keyword,
+                        $options: "i",
                     },
-                    {
-                        mood: {
-                            $regex: keyword,
-                            $options: "i",
-                        },
+                },
+                {
+                    mood: {
+                        $regex: keyword,
+                        $options: "i",
                     },
-                ],
-            }).sort({ createdAt: -1 });
+                },
+            ],
+        }).sort({ createdAt: -1 });
 
         res.status(200).json(compliments);
     } catch (error) {
@@ -118,11 +115,14 @@ const searchCompliments = async (req, res) => {
 
 const addReaction = async (req, res) => {
     try {
-        const { reaction, reactedBy } = req.body;
+        const {
+            reaction,
+            reactedBy,
+        } = req.body;
 
-        // =========================
+        // =================================================
         // FIND COMPLIMENT
-        // =========================
+        // =================================================
 
         const compliment =
             await Compliment.findById(
@@ -135,9 +135,9 @@ const addReaction = async (req, res) => {
             });
         }
 
-        // =========================
+        // =================================================
         // VALIDATE REACTION
-        // =========================
+        // =================================================
 
         if (
             ![
@@ -151,17 +151,36 @@ const addReaction = async (req, res) => {
             });
         }
 
-        // =========================
+        // =================================================
+        // MAKE SURE REACTIONS EXISTS
+        // =================================================
+
+        if (!compliment.reactions) {
+            compliment.reactions = {
+                heart: 0,
+                smile: 0,
+                clap: 0,
+            };
+        }
+
+        if (
+            typeof compliment.reactions[reaction] !==
+            "number"
+        ) {
+            compliment.reactions[reaction] = 0;
+        }
+
+        // =================================================
         // ADD REACTION
-        // =========================
+        // =================================================
 
         compliment.reactions[reaction] += 1;
 
         await compliment.save();
 
-        // =========================
+        // =================================================
         // REACTION EMOJIS
-        // =========================
+        // =================================================
 
         const reactionEmojis = {
             heart: "❤️",
@@ -169,17 +188,15 @@ const addReaction = async (req, res) => {
             clap: "👏",
         };
 
-        // =========================
+        // =================================================
         // NOTIFY COMPLIMENT OWNER
-        // =========================
+        // =================================================
 
         const notificationRecipient =
             compliment.createdBy;
 
-        /*
-         * Don't notify the user if they
-         * reacted to their own compliment.
-         */
+        // Don't notify the person if they reacted
+        // to their own compliment.
 
         if (
             notificationRecipient &&
@@ -203,12 +220,15 @@ const addReaction = async (req, res) => {
 
                 complimentId:
                     compliment._id,
+
+                // Reactions don't have a reply.
+                replyId: null,
             });
         }
 
-        // =========================
+        // =================================================
         // RESPONSE
-        // =========================
+        // =================================================
 
         res.status(200).json(compliment);
     } catch (error) {
@@ -267,7 +287,7 @@ const replyToCompliment = async (req, res) => {
         }
 
         // =================================================
-        // CREATE REPLY OBJECT
+        // CREATE REPLY
         // =================================================
 
         const newReply = {
@@ -278,7 +298,6 @@ const replyToCompliment = async (req, res) => {
                 repliedBy || null,
 
             // Person whose reply this is responding to
-            // OR null if replying to original compliment
             repliedTo:
                 repliedTo || null,
 
@@ -289,13 +308,14 @@ const replyToCompliment = async (req, res) => {
         // SAVE REPLY
         // =================================================
 
-        compliment.replies.push(
-            newReply
-        );
+        compliment.replies.push(newReply);
 
         await compliment.save();
 
-        // Get the actual saved reply
+        // =================================================
+        // GET ACTUAL SAVED REPLY
+        // =================================================
+
         const savedReply =
             compliment.replies[
                 compliment.replies.length - 1
@@ -306,41 +326,36 @@ const replyToCompliment = async (req, res) => {
         // =================================================
 
         /*
-         * CASE 1
-         *
-         * Someone replies to the original compliment:
-         *
-         * Person A creates compliment
-         * Person B replies
-         *
-         * repliedTo = null
-         *
-         * Notification goes to:
-         *
-         * compliment.createdBy
-         *
-         *
-         * CASE 2
-         *
-         * Someone replies to another person's reply:
-         *
-         * Person A creates compliment
-         * Person B replies
-         * Person C replies to Person B
-         *
-         * repliedTo = Person B
-         *
-         * Notification goes to:
-         *
-         * repliedTo
-         */
+            CASE 1:
+            
+            Person A creates compliment.
+            Person B replies.
+
+            repliedTo = null
+
+            Notification goes to:
+            Person A
+        */
+
+        /*
+            CASE 2:
+
+            Person A creates compliment.
+            Person B replies.
+            Person C replies to Person B.
+
+            repliedTo = Person B
+
+            Notification goes to:
+            Person B
+        */
 
         const notificationRecipient =
             repliedTo ||
             compliment.createdBy;
 
         // =================================================
-        // DEBUG LOGS
+        // DEBUG
         // =================================================
 
         console.log(
@@ -372,6 +387,11 @@ const replyToCompliment = async (req, res) => {
         );
 
         console.log(
+            "Saved Reply ID:",
+            savedReply._id
+        );
+
+        console.log(
             "Notification recipient:",
             notificationRecipient
         );
@@ -385,9 +405,9 @@ const replyToCompliment = async (req, res) => {
         // =================================================
 
         /*
-         * Don't notify someone when they
-         * reply to themselves.
-         */
+            Don't notify someone if they are replying
+            to themselves.
+        */
 
         if (
             notificationRecipient &&
@@ -397,13 +417,11 @@ const replyToCompliment = async (req, res) => {
                     repliedBy.toString()
             )
         ) {
-            /*
-             * Different message depending on
-             * what the person replied to.
-             */
+            const isReplyToAnotherReply =
+                !!repliedTo;
 
             const notificationMessage =
-                repliedTo
+                isReplyToAnotherReply
                     ? "Someone replied to your reply 💌"
                     : "Someone replied to your compliment 💌";
 
@@ -413,11 +431,21 @@ const replyToCompliment = async (req, res) => {
 
                 type: "reply",
 
+                emoji: "💌",
+
                 message:
                     notificationMessage,
 
+                // VERY IMPORTANT
+                // Which card should be opened?
                 complimentId:
                     compliment._id,
+
+                // VERY IMPORTANT
+                // Which exact reply should be
+                // highlighted/opened?
+                replyId:
+                    savedReply._id,
             });
 
             console.log(
@@ -427,6 +455,16 @@ const replyToCompliment = async (req, res) => {
             console.log(
                 "Recipient:",
                 notificationRecipient
+            );
+
+            console.log(
+                "Compliment:",
+                compliment._id
+            );
+
+            console.log(
+                "Reply:",
+                savedReply._id
             );
 
             console.log(
@@ -451,7 +489,8 @@ const replyToCompliment = async (req, res) => {
             message:
                 "Reply added successfully",
 
-            reply: savedReply,
+            reply:
+                savedReply,
 
             compliment,
         });

@@ -1463,3 +1463,71 @@ body {
         margin-left: 0;
     }
 }
+.report-success-modal {
+    width: min(420px, 90%);
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    animation: reportPopupIn 0.25s ease;
+}
+
+.success-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: #dcfce7;
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.report-success-modal h3 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    color: #1f2937;
+}
+
+.report-success-modal p {
+    margin: 0 0 22px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.success-close-btn {
+    border: none;
+    background: #7c3aed;
+    color: white;
+    padding: 11px 28px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.success-close-btn:hover {
+    background: #6d28d9;
+}
+
+.report-confirm:disabled,
+.report-cancel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@keyframes reportPopupIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

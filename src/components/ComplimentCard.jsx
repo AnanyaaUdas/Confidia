@@ -9,17 +9,28 @@ const ComplimentCard = ({
     setOpenReply,
     replyText,
     setReplyText,
+
+    // =====================================================
+    // NOTIFICATION PROPS
+    // =====================================================
+
+    highlighted = false,
+    highlightedReplyId = null,
+    notificationType = null,
 }) => {
-    // =========================
+    // =====================================================
     // REPORT
-    // =========================
+    // =====================================================
 
     const [showReportModal, setShowReportModal] = useState(false);
     const [reported, setReported] = useState(false);
+    const [reportLoading, setReportLoading] = useState(false);
+    const [reportSuccess, setReportSuccess] = useState(false);
+    const [reportError, setReportError] = useState("");
 
-    // =========================
+    // =====================================================
     // REACTIONS
-    // =========================
+    // =====================================================
 
     const [reactions, setReactions] = useState({
         heart: item.reactions?.heart || 0,
@@ -29,13 +40,21 @@ const ComplimentCard = ({
 
     const [selectedReaction, setSelectedReaction] = useState(null);
 
-    const addReaction = useAppStore((state) => state.addReaction);
-    const User = useAppStore((state) => state.User);
-    const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+    const addReaction = useAppStore(
+        (state) => state.addReaction
+    );
 
-    // =========================
+    const User = useAppStore(
+        (state) => state.User
+    );
+
+    const isLoggedIn = useAppStore(
+        (state) => state.isLoggedIn
+    );
+
+    // =====================================================
     // REPLIES
-    // =========================
+    // =====================================================
 
     const [localReplies, setLocalReplies] = useState(
         item.replies || []
@@ -46,15 +65,53 @@ const ComplimentCard = ({
     const [replyError, setReplyError] = useState("");
     const [replyingTo, setReplyingTo] = useState(null);
 
-    // Keep local replies synchronized when compliments
-    // are refreshed from the backend.
+    // =====================================================
+    // SYNC REPLIES
+    // =====================================================
+
     useEffect(() => {
         setLocalReplies(item.replies || []);
     }, [item.replies]);
 
-    // =========================
+    // =====================================================
+    // SYNC REACTIONS
+    // =====================================================
+
+    useEffect(() => {
+        setReactions({
+            heart: item.reactions?.heart || 0,
+            smile: item.reactions?.smile || 0,
+            clap: item.reactions?.clap || 0,
+        });
+    }, [item.reactions]);
+
+    // =====================================================
+    // NOTIFICATION HIGHLIGHT
+    // =====================================================
+
+    useEffect(() => {
+        if (highlighted) {
+            console.log(
+                "🌟 HIGHLIGHTING CARD:",
+                item._id
+            );
+        }
+
+        if (highlightedReplyId) {
+            console.log(
+                "💌 HIGHLIGHTING REPLY:",
+                highlightedReplyId
+            );
+        }
+    }, [
+        highlighted,
+        highlightedReplyId,
+        item._id,
+    ]);
+
+    // =====================================================
     // REACTION LIST
-    // =========================
+    // =====================================================
 
     const reactionList = [
         {
@@ -71,9 +128,9 @@ const ComplimentCard = ({
         },
     ];
 
-    // =========================
+    // =====================================================
     // ADD REACTION
-    // =========================
+    // =====================================================
 
     const handleReaction = async (reactionName) => {
         if (selectedReaction === reactionName) {
@@ -83,10 +140,9 @@ const ComplimentCard = ({
         const isFirstReactionOnCard =
             selectedReaction === null;
 
-        // Default/demo cards don't have MongoDB IDs
         if (
             !item._id ||
-            item._id.startsWith("default-")
+            String(item._id).startsWith("default-")
         ) {
             console.log(
                 "This is a default card, not stored in MongoDB."
@@ -100,7 +156,8 @@ const ComplimentCard = ({
                 {
                     method: "PATCH",
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type":
+                            "application/json",
                     },
                     body: JSON.stringify({
                         reaction: reactionName,
@@ -118,7 +175,6 @@ const ComplimentCard = ({
                 );
             }
 
-            // Update reaction counts
             if (data.reactions) {
                 setReactions({
                     heart:
@@ -132,7 +188,6 @@ const ComplimentCard = ({
 
             setSelectedReaction(reactionName);
 
-            // Only count first reaction toward user stats
             if (isFirstReactionOnCard) {
                 addReaction();
             }
@@ -144,9 +199,9 @@ const ComplimentCard = ({
         }
     };
 
-    // =========================
+    // =====================================================
     // SEND REPLY
-    // =========================
+    // =====================================================
 
     const sendReply = async () => {
         const trimmedText = replyText.trim();
@@ -156,13 +211,15 @@ const ComplimentCard = ({
         }
 
         if (!isLoggedIn) {
-            alert("Please log in to reply.");
+            setReplyError(
+                "Please log in to reply."
+            );
             return;
         }
 
         if (
             !item._id ||
-            item._id.startsWith("default-")
+            String(item._id).startsWith("default-")
         ) {
             console.log(
                 "This is a default card, not stored in MongoDB."
@@ -179,17 +236,13 @@ const ComplimentCard = ({
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type":
+                            "application/json",
                     },
                     body: JSON.stringify({
                         text: trimmedText,
-
-                        // Person sending the reply
-                        repliedBy: User?._id || null,
-
-                        // If replying to a specific person,
-                        // use that person. Otherwise reply
-                        // to the original compliment creator.
+                        repliedBy:
+                            User?._id || null,
                         repliedTo:
                             replyingTo ||
                             item.createdBy ||
@@ -206,16 +259,6 @@ const ComplimentCard = ({
                         "Failed to send reply"
                 );
             }
-
-            /*
-             * Backend may return:
-             *
-             * data.reply
-             * data.replies
-             * data.compliment.replies
-             *
-             * We support all three.
-             */
 
             let newReplies = null;
 
@@ -238,11 +281,6 @@ const ComplimentCard = ({
                 ];
             }
 
-            /*
-             * If backend doesn't return the complete
-             * reply, create a temporary local version
-             * so the reply appears immediately.
-             */
             if (!newReplies) {
                 const temporaryReply = {
                     _id: `temp-${Date.now()}`,
@@ -264,21 +302,14 @@ const ComplimentCard = ({
             }
 
             setLocalReplies(newReplies);
-
-            // Clear input
             setReplyText("");
-
-            // Clear replying-to state
             setReplyingTo(null);
-
-            // Show success message
             setReplySent(true);
 
             setTimeout(() => {
                 setReplySent(false);
             }, 2500);
 
-            // Close composer
             setOpenReply(null);
         } catch (error) {
             console.error(
@@ -295,34 +326,121 @@ const ComplimentCard = ({
         }
     };
 
-    // =========================
-    // REPORT
-    // =========================
+    // =====================================================
+    // OPEN REPORT MODAL
+    // =====================================================
 
-    const confirmReport = () => {
-        setReported(true);
-        setShowReportModal(false);
+    const openReportModal = () => {
+        if (reported) {
+            return;
+        }
+
+        setReportError("");
+        setShowReportModal(true);
     };
 
-    // =========================
+    // =====================================================
+    // CONFIRM REPORT
+    // =====================================================
+
+    const confirmReport = async () => {
+        if (!item?._id) {
+            setReportError(
+                "Cannot report this compliment because it has no ID."
+            );
+            return;
+        }
+
+        if (
+            String(item._id).startsWith("default-")
+        ) {
+            setReportError(
+                "This compliment cannot be reported because it is not stored in the database."
+            );
+            return;
+        }
+
+        setReportLoading(true);
+        setReportError("");
+
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/reports",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+                    body: JSON.stringify({
+                        complimentId: item._id,
+                        reportedBy:
+                            User?._id || null,
+                        reason:
+                            "Reported by user",
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                        "Failed to report compliment"
+                );
+            }
+
+            // Report successfully saved
+            setReported(true);
+
+            // Close confirmation modal
+            setShowReportModal(false);
+
+            // Open success popup
+            setReportSuccess(true);
+
+            // Automatically close success popup
+            setTimeout(() => {
+                setReportSuccess(false);
+            }, 3000);
+        } catch (error) {
+            console.error(
+                "Report error:",
+                error
+            );
+
+            setReportError(
+                error.message ||
+                    "Could not report compliment. Please try again."
+            );
+        } finally {
+            setReportLoading(false);
+        }
+    };
+
+    // =====================================================
     // TIME
-    // =========================
+    // =====================================================
 
     const displayTime =
         item.time ||
         (item.createdAt
             ? new Date(
                   item.createdAt
-              ).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-              })
+              ).toLocaleDateString(
+                  "en-US",
+                  {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                  }
+              )
             : "");
 
-    // =========================
+    // =====================================================
     // TOGGLE REPLY BOX
-    // =========================
+    // =====================================================
 
     const toggleReplyBox = () => {
         if (openReply === index) {
@@ -336,9 +454,9 @@ const ComplimentCard = ({
         }
     };
 
-    // =========================
-    // REPLY TO SPECIFIC PERSON
-    // =========================
+    // =====================================================
+    // REPLY TO PERSON
+    // =====================================================
 
     const handleReplyToPerson = (reply) => {
         if (!reply.repliedBy) {
@@ -351,16 +469,71 @@ const ComplimentCard = ({
         setReplyError("");
     };
 
-    // =========================
+    // =====================================================
+    // CARD STYLE
+    // =====================================================
+
+    const notificationCardStyle = highlighted
+        ? {
+              border:
+                  "3px solid #7c3aed",
+              boxShadow:
+                  "0 0 0 5px rgba(124, 58, 237, 0.18), 0 12px 35px rgba(124, 58, 237, 0.30)",
+              transform:
+                  "scale(1.015)",
+              transition:
+                  "all 0.3s ease",
+              position:
+                  "relative",
+              zIndex: 10,
+          }
+        : {};
+
+    // =====================================================
     // RENDER
-    // =========================
+    // =====================================================
 
     return (
-        <article className="compliment-card">
+        <article
+            id={`compliment-${item._id}`}
+            className={`compliment-card ${
+                highlighted
+                    ? "notification-highlight"
+                    : ""
+            }`}
+            style={notificationCardStyle}
+        >
+            {/* =================================================
+                NOTIFICATION LABEL
+            ================================================= */}
 
-            {/* =========================
+            {highlighted && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "-14px",
+                        left: "20px",
+                        background: "#7c3aed",
+                        color: "white",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        zIndex: 20,
+                        boxShadow:
+                            "0 4px 12px rgba(0,0,0,0.2)",
+                    }}
+                >
+                    {notificationType ===
+                    "reply"
+                        ? "💌 Your notification"
+                        : "🔔 Your notification"}
+                </div>
+            )}
+
+            {/* =================================================
                 CARD HEADER
-            ========================= */}
+            ================================================= */}
 
             <div className="card-top">
                 <div>
@@ -371,7 +544,10 @@ const ComplimentCard = ({
                     )}
 
                     <div className="anonymous">
-                        💙 <span>Anonymous</span>
+                        💙{" "}
+                        <span>
+                            Anonymous
+                        </span>
                     </div>
                 </div>
 
@@ -380,62 +556,64 @@ const ComplimentCard = ({
                 </span>
             </div>
 
-            {/* =========================
+            {/* =================================================
                 TO
-            ========================= */}
+            ================================================= */}
 
             <div className="card-to">
                 TO: {item.to}
             </div>
 
-            {/* =========================
+            {/* =================================================
                 MESSAGE
-            ========================= */}
+            ================================================= */}
 
             <p className="card-message">
                 "{item.message}"
             </p>
 
-            {/* =========================
+            {/* =================================================
                 DATE
-            ========================= */}
+            ================================================= */}
 
             <div className="card-time">
                 {displayTime}
             </div>
 
-            {/* =========================
+            {/* =================================================
                 REACTIONS
-            ========================= */}
+            ================================================= */}
 
             <div className="reaction-row">
-                {reactionList.map((reaction) => (
-                    <ReactionButton
-                        key={reaction.name}
-                        emoji={reaction.emoji}
-                        count={
-                            reactions[
+                {reactionList.map(
+                    (reaction) => (
+                        <ReactionButton
+                            key={reaction.name}
+                            emoji={reaction.emoji}
+                            count={
+                                reactions[
+                                    reaction.name
+                                ]
+                            }
+                            selected={
+                                selectedReaction ===
                                 reaction.name
-                            ]
-                        }
-                        selected={
-                            selectedReaction ===
-                            reaction.name
-                        }
-                        onClick={() =>
-                            handleReaction(
-                                reaction.name
-                            )
-                        }
-                    />
-                ))}
+                            }
+                            onClick={() =>
+                                handleReaction(
+                                    reaction.name
+                                )
+                            }
+                        />
+                    )
+                )}
+
+                {/* REPORT BUTTON */}
 
                 <button
                     type="button"
                     className="report-btn"
-                    onClick={() =>
-                        setShowReportModal(true)
-                    }
+                    onClick={openReportModal}
                     disabled={reported}
                 >
                     {reported
@@ -444,19 +622,14 @@ const ComplimentCard = ({
                 </button>
             </div>
 
-            {/* =========================
-                DIVIDER
-            ========================= */}
+            <div className="card-divider" />
 
-            <div className="card-divider"></div>
-
-            {/* =========================
+            {/* =================================================
                 REPLIES
-            ========================= */}
+            ================================================= */}
 
             {localReplies.length > 0 && (
                 <div className="replies-section">
-
                     <div className="replies-title">
                         <span>💌</span>
 
@@ -465,88 +638,113 @@ const ComplimentCard = ({
                         </span>
 
                         <span className="reply-count">
-                            {localReplies.length}
+                            {
+                                localReplies.length
+                            }
                         </span>
                     </div>
 
                     <div className="replies-list">
-
                         {localReplies.map(
                             (
                                 reply,
                                 replyIndex
-                            ) => (
-                                <div
-                                    className="reply-item"
-                                    key={
-                                        reply._id ||
-                                        replyIndex
-                                    }
-                                >
+                            ) => {
+                                const isHighlightedReply =
+                                    highlightedReplyId &&
+                                    String(
+                                        reply._id
+                                    ) ===
+                                        String(
+                                            highlightedReplyId
+                                        );
 
-                                    {/* Reply header */}
-                                    <div className="reply-header">
+                                return (
+                                    <div
+                                        id={
+                                            reply._id
+                                                ? `reply-${reply._id}`
+                                                : undefined
+                                        }
+                                        className={`reply-item ${
+                                            isHighlightedReply
+                                                ? "notification-reply-highlight"
+                                                : ""
+                                        }`}
+                                        style={
+                                            isHighlightedReply
+                                                ? {
+                                                      border:
+                                                          "2px solid #ec4899",
+                                                      background:
+                                                          "rgba(236, 72, 153, 0.10)",
+                                                      boxShadow:
+                                                          "0 0 0 4px rgba(236, 72, 153, 0.12)",
+                                                      transition:
+                                                          "all 0.3s ease",
+                                                  }
+                                                : {}
+                                        }
+                                        key={
+                                            reply._id ||
+                                            replyIndex
+                                        }
+                                    >
+                                        <div className="reply-header">
+                                            <div className="reply-user">
+                                                <span className="reply-avatar">
+                                                    💙
+                                                </span>
 
-                                        <div className="reply-user">
+                                                <span>
+                                                    Anonymous
+                                                </span>
+                                            </div>
 
-                                            <span className="reply-avatar">
-                                                💙
-                                            </span>
-
-                                            <span>
-                                                Anonymous
-                                            </span>
-
+                                            {reply.createdAt && (
+                                                <span className="reply-time">
+                                                    {new Date(
+                                                        reply.createdAt
+                                                    ).toLocaleDateString(
+                                                        "en-US",
+                                                        {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                            year: "numeric",
+                                                        }
+                                                    )}
+                                                </span>
+                                            )}
                                         </div>
 
-                                        {reply.createdAt && (
-                                            <span className="reply-time">
-                                                {new Date(
-                                                    reply.createdAt
-                                                ).toLocaleDateString(
-                                                    "en-US",
-                                                    {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                        year: "numeric",
-                                                    }
-                                                )}
-                                            </span>
+                                        <div className="reply-message">
+                                            "{reply.text}"
+                                        </div>
+
+                                        {reply.repliedBy && (
+                                            <button
+                                                type="button"
+                                                className="reply-to-btn"
+                                                onClick={() =>
+                                                    handleReplyToPerson(
+                                                        reply
+                                                    )
+                                                }
+                                            >
+                                                💬 Reply
+                                            </button>
                                         )}
-
                                     </div>
-
-                                    {/* Reply text */}
-                                    <div className="reply-message">
-                                        "{reply.text}"
-                                    </div>
-
-                                    {/* Reply to this person */}
-                                    {reply.repliedBy && (
-                                        <button
-                                            type="button"
-                                            className="reply-to-btn"
-                                            onClick={() =>
-                                                handleReplyToPerson(
-                                                    reply
-                                                )
-                                            }
-                                        >
-                                            💬 Reply
-                                        </button>
-                                    )}
-
-                                </div>
-                            )
+                                );
+                            }
                         )}
-
                     </div>
                 </div>
             )}
 
-            {/* =========================
+            {/* =================================================
                 REPLY TOGGLE
-            ========================= */}
+            ================================================= */}
 
             <button
                 type="button"
@@ -570,22 +768,20 @@ const ComplimentCard = ({
                 </span>
             </button>
 
-            {/* =========================
-                REPLY COMPOSER
-            ========================= */}
+            {/* =================================================
+                REPLY BOX
+            ================================================= */}
 
             {openReply === index && (
                 <div className="reply-box">
-
-                    {/* Replying to someone */}
                     {replyingTo && (
                         <div className="replying-to">
-
                             <div className="replying-label">
                                 <span>💬</span>
 
                                 <span>
-                                    Replying to this
+                                    Replying
+                                    to this
                                     person
                                 </span>
                             </div>
@@ -605,15 +801,11 @@ const ComplimentCard = ({
                             >
                                 ×
                             </button>
-
                         </div>
                     )}
 
-                    {/* Input + Send */}
                     <div className="reply-input-row">
-
                         <div className="reply-input-wrapper">
-
                             <span className="reply-input-icon">
                                 💬
                             </span>
@@ -627,8 +819,7 @@ const ComplimentCard = ({
                                 maxLength={300}
                                 onChange={(e) => {
                                     setReplyText(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     );
                                     setReplyError(
                                         ""
@@ -650,7 +841,6 @@ const ComplimentCard = ({
                                     }
                                 }}
                             />
-
                         </div>
 
                         <button
@@ -660,7 +850,9 @@ const ComplimentCard = ({
                                 sendingReply ||
                                 !replyText.trim()
                             }
-                            onClick={sendReply}
+                            onClick={
+                                sendReply
+                            }
                         >
                             {sendingReply ? (
                                 "Sending..."
@@ -676,51 +868,51 @@ const ComplimentCard = ({
                                 </>
                             )}
                         </button>
-
                     </div>
 
-                    {/* Footer */}
                     <div className="reply-footer">
-
                         <span>
-                            🔒 Your reply stays
+                            🔒 Your reply
+                            stays
                             anonymous
                         </span>
 
                         <span>
-                            {replyText.length}
+                            {
+                                replyText.length
+                            }
                             /300
                         </span>
-
                     </div>
 
-                    {/* Error */}
                     {replyError && (
                         <div className="reply-error">
-                            ⚠️ {replyError}
+                            ⚠️{" "}
+                            {replyError}
                         </div>
                     )}
 
-                    {/* Success */}
                     {replySent && (
                         <div className="reply-sent-note">
                             💌 Reply sent
                             successfully!
                         </div>
                     )}
-
                 </div>
             )}
 
-            {/* =========================
-                REPORT MODAL
-            ========================= */}
+            {/* =================================================
+                REPORT CONFIRMATION MODAL
+            ================================================= */}
 
             {showReportModal && (
                 <div
                     className="report-overlay"
                     onClick={() =>
-                        setShowReportModal(false)
+                        !reportLoading &&
+                        setShowReportModal(
+                            false
+                        )
                     }
                 >
                     <div
@@ -729,27 +921,52 @@ const ComplimentCard = ({
                             e.stopPropagation()
                         }
                     >
-
                         <div className="report-icon">
                             🚩
                         </div>
 
                         <h3>
-                            Report this compliment?
+                            Report this
+                            compliment?
                         </h3>
 
                         <p>
-                            This will flag the post
-                            for review. You're
-                            helping keep the wall
-                            kind and safe.
+                            This will flag
+                            the post for
+                            review. You're
+                            helping keep
+                            the wall kind
+                            and safe.
                         </p>
 
-                        <div className="report-actions">
+                        {reportError && (
+                            <div
+                                style={{
+                                    color: "#dc2626",
+                                    background:
+                                        "#fee2e2",
+                                    padding:
+                                        "10px 12px",
+                                    borderRadius:
+                                        "8px",
+                                    marginBottom:
+                                        "15px",
+                                    fontSize:
+                                        "14px",
+                                }}
+                            >
+                                ⚠️{" "}
+                                {reportError}
+                            </div>
+                        )}
 
+                        <div className="report-actions">
                             <button
                                 type="button"
                                 className="report-cancel"
+                                disabled={
+                                    reportLoading
+                                }
                                 onClick={() =>
                                     setShowReportModal(
                                         false
@@ -762,19 +979,74 @@ const ComplimentCard = ({
                             <button
                                 type="button"
                                 className="report-confirm"
+                                disabled={
+                                    reportLoading
+                                }
                                 onClick={
                                     confirmReport
                                 }
                             >
-                                Yes, Report
+                                {reportLoading
+                                    ? "Reporting..."
+                                    : "Yes, Report"}
                             </button>
-
                         </div>
-
                     </div>
                 </div>
             )}
 
+            {/* =================================================
+                REPORT SUCCESS POPUP
+            ================================================= */}
+
+            {reportSuccess && (
+                <div
+                    className="report-overlay"
+                    onClick={() =>
+                        setReportSuccess(
+                            false
+                        )
+                    }
+                >
+                    <div
+                        className="report-success-modal"
+                        onClick={(e) =>
+                            e.stopPropagation()
+                        }
+                    >
+                        <div className="success-icon">
+                            ✓
+                        </div>
+
+                        <h3>
+                            Report submitted
+                        </h3>
+
+                        <p>
+                            Thank you for
+                            helping keep
+                            Confidia kind
+                            and safe. The
+                            compliment has
+                            been sent to
+                            the admin for
+                            review.
+                        </p>
+
+                        <button
+                            type="button"
+                            className="success-close-btn"
+                            onClick={() =>
+                                setReportSuccess(
+                                    false
+                                )
+                            }
+                        >
+                            Done
+                        </button>
+                    </div>
+                </div>
+            )}
         </article>
     );
 };
