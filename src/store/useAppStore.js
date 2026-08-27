@@ -4,7 +4,9 @@ import { create } from "zustand";
 // DAY STREAK HELPER
 // =====================================================
 
-const getTodayStr = () => new Date().toDateString();
+const getTodayStr = () => {
+    return new Date().toDateString();
+};
 
 const bumpStreak = (currentStreak) => {
     const todayStr = getTodayStr();
@@ -13,27 +15,59 @@ const bumpStreak = (currentStreak) => {
         "confidiaLastActive"
     );
 
-    // Already counted today
+    // =================================================
+    // ALREADY ACTIVE TODAY
+    // =================================================
+
     if (lastActive === todayStr) {
-        return currentStreak;
+
+        // IMPORTANT:
+        // If localStorage says the user was active today
+        // but the saved streak is somehow 0,
+        // repair it to 1.
+
+        return Math.max(
+            Number(currentStreak) || 0,
+            1
+        );
     }
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+    // =================================================
+    // YESTERDAY
+    // =================================================
 
-    const yesterdayStr = yesterday.toDateString();
+    const yesterday = new Date();
+
+    yesterday.setDate(
+        yesterday.getDate() - 1
+    );
+
+    const yesterdayStr =
+        yesterday.toDateString();
+
+    // =================================================
+    // SAVE TODAY AS LAST ACTIVE
+    // =================================================
 
     localStorage.setItem(
         "confidiaLastActive",
         todayStr
     );
 
-    // Active yesterday -> continue streak
+    // =================================================
+    // CONTINUE STREAK
+    // =================================================
+
     if (lastActive === yesterdayStr) {
-        return currentStreak + 1;
+        return (
+            Number(currentStreak) || 0
+        ) + 1;
     }
 
-    // First time or missed a day
+    // =================================================
+    // FIRST ACTION / MISSED DAY
+    // =================================================
+
     return 1;
 };
 
@@ -57,11 +91,22 @@ const emptyUser = {
 // =====================================================
 
 const buildUser = (user = {}) => ({
-    _id: user?._id || user?.id || "",
-    username: user?.username || "",
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    memberSince: user?.memberSince || "",
+    _id:
+        user?._id ||
+        user?.id ||
+        "",
+
+    username:
+        user?.username || "",
+
+    firstName:
+        user?.firstName || "",
+
+    lastName:
+        user?.lastName || "",
+
+    memberSince:
+        user?.memberSince || "",
 
     complimentsShared:
         Number(user?.complimentsShared) || 0,
@@ -74,7 +119,7 @@ const buildUser = (user = {}) => ({
 });
 
 // =====================================================
-// SAVE USER TO LOCAL STORAGE
+// SAVE USER
 // =====================================================
 
 const saveUserToStorage = (user) => {
@@ -102,9 +147,10 @@ const saveUserToStorage = (user) => {
 
 const getStoredUser = () => {
     try {
-        const raw = localStorage.getItem(
-            "confidiaUser"
-        );
+        const raw =
+            localStorage.getItem(
+                "confidiaUser"
+            );
 
         const wasLoggedIn =
             localStorage.getItem(
@@ -118,13 +164,42 @@ const getStoredUser = () => {
             };
         }
 
+        const storedUser =
+            buildUser(JSON.parse(raw));
+
+        // =================================================
+        // REPAIR TODAY'S STREAK
+        // =================================================
+
+        const todayStr = getTodayStr();
+
+        const lastActive =
+            localStorage.getItem(
+                "confidiaLastActive"
+            );
+
+        // If the user already performed a kindness
+        // action today but somehow has streak 0,
+        // restore it to 1.
+
+        if (
+            lastActive === todayStr &&
+            storedUser.dayStreak < 1
+        ) {
+            storedUser.dayStreak = 1;
+
+            saveUserToStorage(
+                storedUser
+            );
+        }
+
         return {
-            User: buildUser(
-                JSON.parse(raw)
-            ),
+            User: storedUser,
             isLoggedIn: true,
         };
+
     } catch (error) {
+
         console.error(
             "Failed to restore saved session:",
             error
@@ -134,6 +209,57 @@ const getStoredUser = () => {
             User: emptyUser,
             isLoggedIn: false,
         };
+    }
+};
+
+// =====================================================
+// GET REACTED COMPLIMENT IDS
+// =====================================================
+
+const getStoredReactedCompliments = () => {
+    try {
+        const raw =
+            localStorage.getItem(
+                "confidiaReactedCompliments"
+            );
+
+        if (!raw) {
+            return [];
+        }
+
+        const parsed =
+            JSON.parse(raw);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            "Failed to restore reacted compliments:",
+            error
+        );
+
+        return [];
+    }
+};
+
+// =====================================================
+// SAVE REACTED COMPLIMENT IDS
+// =====================================================
+
+const saveReactedCompliments = (ids) => {
+    try {
+        localStorage.setItem(
+            "confidiaReactedCompliments",
+            JSON.stringify(ids)
+        );
+    } catch (error) {
+        console.error(
+            "Failed to save reacted compliments:",
+            error
+        );
     }
 };
 
@@ -167,9 +293,13 @@ const useAppStore = create((set) => ({
     // =====================================================
 
     setUser: (user) => {
-        const newUser = buildUser(user);
 
-        saveUserToStorage(newUser);
+        const newUser =
+            buildUser(user);
+
+        saveUserToStorage(
+            newUser
+        );
 
         set({
             User: newUser,
@@ -182,6 +312,7 @@ const useAppStore = create((set) => ({
     // =====================================================
 
     logout: () => {
+
         localStorage.removeItem(
             "confidiaUser"
         );
@@ -194,9 +325,14 @@ const useAppStore = create((set) => ({
             "confidiaLastActive"
         );
 
+        localStorage.removeItem(
+            "confidiaReactedCompliments"
+        );
+
         set({
             isLoggedIn: false,
             User: emptyUser,
+            reactedComplimentIds: [],
         });
     },
 
@@ -205,34 +341,46 @@ const useAppStore = create((set) => ({
     // =====================================================
 
     badges: [
+
         {
             emoji: "💌",
             title: "First Compliment",
-            description: "Break the ice.",
+            description:
+                "Break the ice.",
             target: 1,
         },
 
         {
             emoji: "🌸",
             title: "Spread Happiness",
-            description: "10 compliments.",
+            description:
+                "10 compliments.",
             target: 10,
         },
 
         {
             emoji: "⭐",
             title: "Campus Hero",
-            description: "100 reactions.",
+            description:
+                "100 reactions.",
             target: 100,
         },
 
         {
             emoji: "🔥",
             title: "Kindness Streak",
-            description: "5 days in a row.",
+            description:
+                "5 days in a row.",
             target: 5,
         },
     ],
+
+    // =====================================================
+    // REACTED COMPLIMENTS
+    // =====================================================
+
+    reactedComplimentIds:
+        getStoredReactedCompliments(),
 
     // =====================================================
     // BADGE CELEBRATION
@@ -257,27 +405,47 @@ const useAppStore = create((set) => ({
     compliments: [],
 
     addCompliment: (compliment) =>
+
         set((state) => {
 
             const beforeShared =
-                state.User.complimentsShared;
+                Number(
+                    state.User
+                        .complimentsShared
+                ) || 0;
 
             const beforeStreak =
-                state.User.dayStreak;
+                Number(
+                    state.User.dayStreak
+                ) || 0;
+
+            // =================================================
+            // INCREASE COMPLIMENT COUNT
+            // =================================================
 
             const afterShared =
                 beforeShared + 1;
 
+            // =================================================
+            // INCREASE STREAK
+            // =================================================
+
             const afterStreak =
-                bumpStreak(beforeStreak);
+                bumpStreak(
+                    beforeStreak
+                );
 
             let unlocked = null;
 
-            // First compliment
+            // =================================================
+            // FIRST COMPLIMENT
+            // =================================================
+
             if (
                 beforeShared < 1 &&
                 afterShared >= 1
             ) {
+
                 unlocked =
                     state.badges.find(
                         (badge) =>
@@ -286,11 +454,15 @@ const useAppStore = create((set) => ({
                     );
             }
 
-            // 10 compliments
+            // =================================================
+            // 10 COMPLIMENTS
+            // =================================================
+
             else if (
                 beforeShared < 10 &&
                 afterShared >= 10
             ) {
+
                 unlocked =
                     state.badges.find(
                         (badge) =>
@@ -299,11 +471,15 @@ const useAppStore = create((set) => ({
                     );
             }
 
-            // 5-day streak
+            // =================================================
+            // 5 DAY STREAK
+            // =================================================
+
             else if (
                 beforeStreak < 5 &&
                 afterStreak >= 5
             ) {
+
                 unlocked =
                     state.badges.find(
                         (badge) =>
@@ -312,7 +488,12 @@ const useAppStore = create((set) => ({
                     );
             }
 
+            // =================================================
+            // UPDATED USER
+            // =================================================
+
             const updatedUser = {
+
                 ...state.User,
 
                 complimentsShared:
@@ -322,21 +503,23 @@ const useAppStore = create((set) => ({
                     afterStreak,
             };
 
-            // ⭐ IMPORTANT
-            // Save updated statistics
-            // so refresh does NOT reset them.
+            // =================================================
+            // SAVE
+            // =================================================
 
             saveUserToStorage(
                 updatedUser
             );
 
             return {
+
                 compliments: [
                     ...state.compliments,
                     compliment,
                 ],
 
-                User: updatedUser,
+                User:
+                    updatedUser,
 
                 celebration:
                     unlocked ||
@@ -345,31 +528,71 @@ const useAppStore = create((set) => ({
         }),
 
     // =====================================================
-    // REACTIONS GIVEN
+    // REACTION ADDED
     // =====================================================
 
-    addReaction: () =>
+    addReaction: (complimentId) =>
+
         set((state) => {
 
-            const beforeGiven =
-                state.User.reactionsGiven;
+            if (!complimentId) {
+                return state;
+            }
 
-            const beforeStreak =
-                state.User.dayStreak;
+            const id =
+                String(complimentId);
+
+            // =================================================
+            // CHECK IF ALREADY REACTED
+            // =================================================
+
+            const alreadyReacted =
+                state.reactedComplimentIds.includes(
+                    id
+                );
+
+            if (alreadyReacted) {
+                return state;
+            }
+
+            // =================================================
+            // REACTION COUNT
+            // =================================================
+
+            const beforeGiven =
+                Number(
+                    state.User
+                        .reactionsGiven
+                ) || 0;
 
             const afterGiven =
                 beforeGiven + 1;
 
+            // =================================================
+            // STREAK
+            // =================================================
+
+            const beforeStreak =
+                Number(
+                    state.User.dayStreak
+                ) || 0;
+
             const afterStreak =
-                bumpStreak(beforeStreak);
+                bumpStreak(
+                    beforeStreak
+                );
 
             let unlocked = null;
 
-            // 100 reactions
+            // =================================================
+            // 100 REACTIONS
+            // =================================================
+
             if (
                 beforeGiven < 100 &&
                 afterGiven >= 100
             ) {
+
                 unlocked =
                     state.badges.find(
                         (badge) =>
@@ -378,11 +601,15 @@ const useAppStore = create((set) => ({
                     );
             }
 
-            // 5-day streak
+            // =================================================
+            // 5 DAY STREAK
+            // =================================================
+
             else if (
                 beforeStreak < 5 &&
                 afterStreak >= 5
             ) {
+
                 unlocked =
                     state.badges.find(
                         (badge) =>
@@ -391,7 +618,12 @@ const useAppStore = create((set) => ({
                     );
             }
 
+            // =================================================
+            // UPDATED USER
+            // =================================================
+
             const updatedUser = {
+
                 ...state.User,
 
                 reactionsGiven:
@@ -401,19 +633,121 @@ const useAppStore = create((set) => ({
                     afterStreak,
             };
 
-            // ⭐ IMPORTANT
-            // Save updated statistics.
+            // =================================================
+            // SAVE REACTION ID
+            // =================================================
+
+            const updatedIds = [
+                ...state.reactedComplimentIds,
+                id,
+            ];
+
+            // =================================================
+            // SAVE USER
+            // =================================================
 
             saveUserToStorage(
                 updatedUser
             );
 
+            saveReactedCompliments(
+                updatedIds
+            );
+
             return {
-                User: updatedUser,
+
+                User:
+                    updatedUser,
+
+                reactedComplimentIds:
+                    updatedIds,
 
                 celebration:
                     unlocked ||
                     state.celebration,
+            };
+        }),
+
+    // =====================================================
+    // REACTION REMOVED
+    // =====================================================
+
+    removeReaction: (complimentId) =>
+
+        set((state) => {
+
+            if (!complimentId) {
+                return state;
+            }
+
+            const id =
+                String(complimentId);
+
+            const alreadyReacted =
+                state.reactedComplimentIds.includes(
+                    id
+                );
+
+            // =================================================
+            // NOTHING TO REMOVE
+            // =================================================
+
+            if (!alreadyReacted) {
+                return state;
+            }
+
+            // =================================================
+            // REMOVE ID
+            // =================================================
+
+            const updatedIds =
+                state.reactedComplimentIds.filter(
+                    (storedId) =>
+                        storedId !== id
+                );
+
+            // =================================================
+            // DECREASE REACTION COUNT
+            // =================================================
+
+            const afterGiven =
+                Math.max(
+                    0,
+                    (
+                        Number(
+                            state.User
+                                .reactionsGiven
+                        ) || 0
+                    ) - 1
+                );
+
+            const updatedUser = {
+
+                ...state.User,
+
+                reactionsGiven:
+                    afterGiven,
+            };
+
+            // =================================================
+            // SAVE
+            // =================================================
+
+            saveUserToStorage(
+                updatedUser
+            );
+
+            saveReactedCompliments(
+                updatedIds
+            );
+
+            return {
+
+                User:
+                    updatedUser,
+
+                reactedComplimentIds:
+                    updatedIds,
             };
         }),
 }));
