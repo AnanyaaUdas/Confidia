@@ -1,88 +1,68 @@
-# Confidia — Updated (MongoDB Backend + Anonymous Chat)
+# 💗 Confidia
 
-Anonymous kindness wall for campus, with a real MongoDB backend and admin dashboard.
+Confidia is an anonymous platform for college students to share compliments, appreciation, and positive messages with people in their college community.
 
-## Requirements
+The goal of Confidia is to create a safe and positive digital space where students can appreciate others without feeling pressured to reveal their identity.
 
-- Node.js 18+
-- MongoDB running locally (`mongodb://127.0.0.1:27017`)
-- Database name: **confidia** (collections: `users`, `compliments`)
+## ✨ Features
 
-## Setup
+- 💌 **Anonymous Compliments**  
+  Write and share compliments without revealing your identity.
 
-### 1. Backend
+- 🌸 **Kindness Wall**  
+  View positive messages shared by students.
 
-```bash
-cd backend
-npm install
-npm run dev
-```
+- 🎯 **Kindness Prompts**  
+  Get random prompts to help you think of something kind to say.
 
-Runs on **http://localhost:4000**
+- 🎲 **Kindness Wheel**  
+  Generate a random kindness prompt whenever you need inspiration.
 
-Admin login:
-- Username: `admin`
-- Password: `confidia2026`
+- 🏷️ **Categories**  
+  Organize compliments into categories such as:
+  - Everyone
+  - Friends
+  - Teachers
+  - College
+  - Clubs
 
-### 2. Frontend
+- 😊 **Mood Selection**  
+  Choose the mood behind your compliment, such as:
+  - Grateful
+  - Happy
+  - Inspired
+  - Proud
+  - Appreciative
 
-```bash
-# from project root
-npm install
-npm run dev
-```
+- 💌 **Anonymous Replies**  
+  Recipients can respond to compliments anonymously.
 
-Runs on **http://localhost:5173**
+- 🚨 **Moderation & Reporting**  
+  Content can be reported for review to help maintain a positive environment.
 
-## Features
+- 📱 **Responsive Design**  
+  The interface is designed to work across desktop, tablet, and mobile devices.
 
-- Compliments stored in MongoDB
-- Admin dashboard reads **live stats, users, compliments, reports** from DB
-- Approve / delete moderation
-- Anonymous campus chat (Socket.io + MongoDB history)
-- Report & react endpoints
+## 🛠️ Tech Stack
 
-## Routes
+### Frontend
 
-| Path | Description |
-|------|-------------|
-| `/` | Home |
-| `/wall` | Kindness wall |
-| `/write` | Write a compliment |
-| `/chat` | Anonymous chat |
-| `/Profile` | Badges |
-| `/admin-login` | Admin dashboard |
+- React
+- JavaScript
+- HTML5
+- CSS3
+- Vite
+- React Router
 
-## API (backend)
+### Backend
 
-- `GET  /api/compliments`
-- `POST /api/compliments`
-- `POST /api/compliments/:id/report`
-- `POST /api/compliments/:id/react`
-- `POST /api/admin/login`
-- `GET  /api/admin/stats`
-- `GET  /api/admin/pending`
-- `GET  /api/admin/compliments`
-- `GET  /api/admin/users`
-- `GET  /api/admin/moderation-log`
-- `POST /api/admin/approve/:id`
-- `DELETE /api/admin/compliments/:id`
+- Node.js
+- Express.js
 
-## Note on compliments schema
+### Database
 
-Compliment documents should have fields like:
+- MongoDB
 
-```json
-{
-  "to": "SOMEONE",
-  "message": "...",
-  "emoji": "💌",
-  "category": "friends",
-  "counts": [0, 0, 0],
-  "commentsCount": 0,
-  "reported": false,
-  "reportReason": null
-}
-```
+### Data & Storage
 
-If your existing `compliments` collection uses different field names, rename them in Compass or adjust `server.js` schema.
+- LocalStorage
