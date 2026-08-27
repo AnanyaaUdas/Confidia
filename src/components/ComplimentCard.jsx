@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+    useEffect,
+    useState,
+} from "react";
+
 import ReactionButton from "./ReactionButton";
+
 import useAppStore from "../store/useAppStore";
 
 const ComplimentCard = ({
@@ -9,6 +14,9 @@ const ComplimentCard = ({
     setOpenReply,
     replyText,
     setReplyText,
+    // REACTION UPDATE
+    onReactionUpdated,
+
 
     // =====================================================
     // NOTIFICATION PROPS
@@ -18,59 +26,119 @@ const ComplimentCard = ({
     highlightedReplyId = null,
     notificationType = null,
 }) => {
+
     // =====================================================
     // REPORT
     // =====================================================
 
-    const [showReportModal, setShowReportModal] = useState(false);
-    const [reported, setReported] = useState(false);
-    const [reportLoading, setReportLoading] = useState(false);
-    const [reportSuccess, setReportSuccess] = useState(false);
-    const [reportError, setReportError] = useState("");
+    const [
+        showReportModal,
+        setShowReportModal,
+    ] = useState(false);
+
+    const [
+        reported,
+        setReported,
+    ] = useState(false);
+
+    const [
+        reportLoading,
+        setReportLoading,
+    ] = useState(false);
+
+    const [
+        reportSuccess,
+        setReportSuccess,
+    ] = useState(false);
+
+    const [
+        reportError,
+        setReportError,
+    ] = useState("");
 
     // =====================================================
     // REACTIONS
     // =====================================================
 
-    const [reactions, setReactions] = useState({
-        heart: item.reactions?.heart || 0,
-        smile: item.reactions?.smile || 0,
-        clap: item.reactions?.clap || 0,
+    const [
+        reactions,
+        setReactions,
+    ] = useState({
+        heart:
+            item.reactions?.heart || 0,
+
+        smile:
+            item.reactions?.smile || 0,
+
+        clap:
+            item.reactions?.clap || 0,
     });
 
-    const [selectedReaction, setSelectedReaction] = useState(null);
+    const [
+        selectedReaction,
+        setSelectedReaction,
+    ] = useState(
+        item.userReaction || null
+    );
+
+    // =====================================================
+    // ZUSTAND
+    // =====================================================
 
     const addReaction = useAppStore(
-        (state) => state.addReaction
+        (state) =>
+            state.addReaction
     );
 
     const User = useAppStore(
-        (state) => state.User
+        (state) =>
+            state.User
     );
 
     const isLoggedIn = useAppStore(
-        (state) => state.isLoggedIn
+        (state) =>
+            state.isLoggedIn
     );
 
     // =====================================================
     // REPLIES
     // =====================================================
 
-    const [localReplies, setLocalReplies] = useState(
+    const [
+        localReplies,
+        setLocalReplies,
+    ] = useState(
         item.replies || []
     );
 
-    const [sendingReply, setSendingReply] = useState(false);
-    const [replySent, setReplySent] = useState(false);
-    const [replyError, setReplyError] = useState("");
-    const [replyingTo, setReplyingTo] = useState(null);
+    const [
+        sendingReply,
+        setSendingReply,
+    ] = useState(false);
+
+    const [
+        replySent,
+        setReplySent,
+    ] = useState(false);
+
+    const [
+        replyError,
+        setReplyError,
+    ] = useState("");
+
+    const [
+        replyingTo,
+        setReplyingTo,
+    ] = useState(null);
 
     // =====================================================
     // SYNC REPLIES
     // =====================================================
 
     useEffect(() => {
-        setLocalReplies(item.replies || []);
+        setLocalReplies(
+            item.replies || []
+        );
     }, [item.replies]);
 
     // =====================================================
@@ -79,11 +147,23 @@ const ComplimentCard = ({
 
     useEffect(() => {
         setReactions({
-            heart: item.reactions?.heart || 0,
-            smile: item.reactions?.smile || 0,
-            clap: item.reactions?.clap || 0,
+            heart:
+                item.reactions?.heart || 0,
+
+            smile:
+                item.reactions?.smile || 0,
+
+            clap:
+                item.reactions?.clap || 0,
         });
-    }, [item.reactions]);
+
+        setSelectedReaction(
+            item.userReaction || null
+        );
+    }, [
+        item.reactions,
+        item.userReaction,
+    ]);
 
     // =====================================================
     // NOTIFICATION HIGHLIGHT
@@ -118,10 +198,12 @@ const ComplimentCard = ({
             emoji: "❤️",
             name: "heart",
         },
+
         {
             emoji: "😊",
             name: "smile",
         },
+
         {
             emoji: "👏",
             name: "clap",
@@ -129,69 +211,158 @@ const ComplimentCard = ({
     ];
 
     // =====================================================
-    // ADD REACTION
+    // HANDLE REACTION
     // =====================================================
 
-    const handleReaction = async (reactionName) => {
-        if (selectedReaction === reactionName) {
+    const handleReaction = async (
+        reactionName
+    ) => {
+
+        // =================================================
+        // CHECK LOGIN
+        // =================================================
+
+        if (!isLoggedIn) {
+            console.log(
+                "Please log in to react."
+            );
+
             return;
         }
 
-        const isFirstReactionOnCard =
-            selectedReaction === null;
+        // =================================================
+        // CHECK COMPLIMENT ID
+        // =================================================
 
         if (
-            !item._id ||
-            String(item._id).startsWith("default-")
+            !item?._id ||
+            String(item._id).startsWith(
+                "default-"
+            )
         ) {
             console.log(
                 "This is a default card, not stored in MongoDB."
             );
+
             return;
         }
 
-        try {
-            const response = await fetch(
-                `http://localhost:5000/api/compliments/${item._id}/reaction`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        reaction: reactionName,
-                        reactedBy: User?._id || null,
-                    }),
-                }
-            );
+        // =================================================
+        // DETERMINE ACTION
+        // =================================================
 
-            const data = await response.json();
+        const isRemoving =
+            selectedReaction ===
+            reactionName;
+
+        try {
+
+            const response =
+                await fetch(
+                    `http://localhost:5000/api/compliments/${item._id}/reaction`,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+
+                        body: JSON.stringify({
+                            reaction:
+                                reactionName,
+
+                            reactedBy:
+                                User?._id ||
+                                null,
+
+                            action:
+                                isRemoving
+                                    ? "remove"
+                                    : "add",
+                        }),
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            // =================================================
+            // ERROR
+            // =================================================
 
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                        "Failed to add reaction"
+                        "Failed to update reaction"
                 );
             }
 
+            console.log(
+                "Reaction response:",
+                data
+            );
+
+            // =================================================
+            // UPDATE COUNTS FROM DATABASE
+            // =================================================
+
             if (data.reactions) {
+
                 setReactions({
                     heart:
-                        data.reactions.heart || 0,
+                        data.reactions
+                            .heart || 0,
+
                     smile:
-                        data.reactions.smile || 0,
+                        data.reactions
+                            .smile || 0,
+
                     clap:
-                        data.reactions.clap || 0,
+                        data.reactions
+                            .clap || 0,
                 });
             }
+            if (
+                    onReactionUpdated &&
+                    data.reactions
+                ) {
+                    onReactionUpdated(
+                        item._id,
+                        data.reactions
+                    );
+                }
 
-            setSelectedReaction(reactionName);
+            // =================================================
+            // UPDATE SELECTED REACTION
+            // =================================================
 
-            if (isFirstReactionOnCard) {
+            if (isRemoving) {
+
+                setSelectedReaction(
+                    null
+                );
+
+            } else {
+
+                setSelectedReaction(
+                    reactionName
+                );
+            }
+
+            // =================================================
+            // UPDATE USER STAT
+            // =================================================
+
+            // Only count a reaction when
+            // the user is adding one.
+
+            if (!isRemoving) {
                 addReaction();
             }
+
         } catch (error) {
+
             console.error(
                 "Reaction error:",
                 error
@@ -204,26 +375,37 @@ const ComplimentCard = ({
     // =====================================================
 
     const sendReply = async () => {
-        const trimmedText = replyText.trim();
 
+        const trimmedText =
+            replyText.trim();
+
+        // Don't send empty reply
         if (!trimmedText) {
             return;
         }
 
+        // User must be logged in
         if (!isLoggedIn) {
+
             setReplyError(
                 "Please log in to reply."
             );
+
             return;
         }
 
+        // Make sure compliment exists
         if (
-            !item._id ||
-            String(item._id).startsWith("default-")
+            !item?._id ||
+            String(item._id).startsWith(
+                "default-"
+            )
         ) {
+
             console.log(
                 "This is a default card, not stored in MongoDB."
             );
+
             return;
         }
 
@@ -231,27 +413,35 @@ const ComplimentCard = ({
         setReplyError("");
 
         try {
-            const response = await fetch(
-                `http://localhost:5000/api/compliments/${item._id}/reply`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        text: trimmedText,
-                        repliedBy:
-                            User?._id || null,
-                        repliedTo:
-                            replyingTo ||
-                            item.createdBy ||
-                            null,
-                    }),
-                }
-            );
 
-            const data = await response.json();
+            const response =
+                await fetch(
+                    `http://localhost:5000/api/compliments/${item._id}/reply`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+
+                        body: JSON.stringify({
+                            text: trimmedText,
+
+                            repliedBy:
+                                User?._id ||
+                                null,
+
+                            repliedTo:
+                                replyingTo ||
+                                item.createdBy ||
+                                null,
+                        }),
+                    }
+                );
+
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
@@ -259,6 +449,10 @@ const ComplimentCard = ({
                         "Failed to send reply"
                 );
             }
+
+            // =================================================
+            // UPDATE REPLIES
+            // =================================================
 
             let newReplies = null;
 
@@ -268,29 +462,52 @@ const ComplimentCard = ({
                     data.compliment.replies
                 )
             ) {
+
                 newReplies =
-                    data.compliment.replies;
+                    data.compliment
+                        .replies;
+
             } else if (
-                Array.isArray(data.replies)
+                Array.isArray(
+                    data.replies
+                )
             ) {
-                newReplies = data.replies;
-            } else if (data.reply) {
+
+                newReplies =
+                    data.replies;
+
+            } else if (
+                data.reply
+            ) {
+
                 newReplies = [
                     ...localReplies,
                     data.reply,
                 ];
             }
 
+            // =================================================
+            // FALLBACK REPLY
+            // =================================================
+
             if (!newReplies) {
+
                 const temporaryReply = {
-                    _id: `temp-${Date.now()}`,
-                    text: trimmedText,
+                    _id:
+                        `temp-${Date.now()}`,
+
+                    text:
+                        trimmedText,
+
                     repliedBy:
-                        User?._id || null,
+                        User?._id ||
+                        null,
+
                     repliedTo:
                         replyingTo ||
                         item.createdBy ||
                         null,
+
                     createdAt:
                         new Date().toISOString(),
                 };
@@ -301,9 +518,18 @@ const ComplimentCard = ({
                 ];
             }
 
-            setLocalReplies(newReplies);
+            setLocalReplies(
+                newReplies
+            );
+
+            // =================================================
+            // CLEAR FORM
+            // =================================================
+
             setReplyText("");
+
             setReplyingTo(null);
+
             setReplySent(true);
 
             setTimeout(() => {
@@ -311,7 +537,9 @@ const ComplimentCard = ({
             }, 2500);
 
             setOpenReply(null);
+
         } catch (error) {
+
             console.error(
                 "Reply error:",
                 error
@@ -321,7 +549,9 @@ const ComplimentCard = ({
                 error.message ||
                     "Could not send reply. Please try again."
             );
+
         } finally {
+
             setSendingReply(false);
         }
     };
@@ -331,11 +561,13 @@ const ComplimentCard = ({
     // =====================================================
 
     const openReportModal = () => {
+
         if (reported) {
             return;
         }
 
         setReportError("");
+
         setShowReportModal(true);
     };
 
@@ -344,19 +576,26 @@ const ComplimentCard = ({
     // =====================================================
 
     const confirmReport = async () => {
+
         if (!item?._id) {
+
             setReportError(
                 "Cannot report this compliment because it has no ID."
             );
+
             return;
         }
 
         if (
-            String(item._id).startsWith("default-")
+            String(item._id).startsWith(
+                "default-"
+            )
         ) {
+
             setReportError(
                 "This compliment cannot be reported because it is not stored in the database."
             );
+
             return;
         }
 
@@ -364,25 +603,34 @@ const ComplimentCard = ({
         setReportError("");
 
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/reports",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        complimentId: item._id,
-                        reportedBy:
-                            User?._id || null,
-                        reason:
-                            "Reported by user",
-                    }),
-                }
-            );
 
-            const data = await response.json();
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/reports",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+
+                        body: JSON.stringify({
+                            complimentId:
+                                item._id,
+
+                            reportedBy:
+                                User?._id ||
+                                null,
+
+                            reason:
+                                "Reported by user",
+                        }),
+                    }
+                );
+
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
@@ -391,20 +639,22 @@ const ComplimentCard = ({
                 );
             }
 
-            // Report successfully saved
             setReported(true);
 
-            // Close confirmation modal
-            setShowReportModal(false);
+            setShowReportModal(
+                false
+            );
 
-            // Open success popup
             setReportSuccess(true);
 
-            // Automatically close success popup
             setTimeout(() => {
-                setReportSuccess(false);
+                setReportSuccess(
+                    false
+                );
             }, 3000);
+
         } catch (error) {
+
             console.error(
                 "Report error:",
                 error
@@ -414,7 +664,9 @@ const ComplimentCard = ({
                 error.message ||
                     "Could not report compliment. Please try again."
             );
+
         } finally {
+
             setReportLoading(false);
         }
     };
@@ -425,31 +677,43 @@ const ComplimentCard = ({
 
     const displayTime =
         item.time ||
-        (item.createdAt
-            ? new Date(
-                  item.createdAt
-              ).toLocaleDateString(
-                  "en-US",
-                  {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                  }
-              )
-            : "");
+        (
+            item.createdAt
+                ? new Date(
+                      item.createdAt
+                  ).toLocaleDateString(
+                      "en-US",
+                      {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                      }
+                  )
+                : ""
+        );
 
     // =====================================================
     // TOGGLE REPLY BOX
     // =====================================================
 
     const toggleReplyBox = () => {
-        if (openReply === index) {
+
+        if (
+            openReply === index
+        ) {
+
             setOpenReply(null);
+
             setReplyingTo(null);
+
             setReplyText("");
+
             setReplyError("");
+
         } else {
+
             setOpenReply(index);
+
             setReplyError("");
         }
     };
@@ -458,14 +722,22 @@ const ComplimentCard = ({
     // REPLY TO PERSON
     // =====================================================
 
-    const handleReplyToPerson = (reply) => {
+    const handleReplyToPerson = (
+        reply
+    ) => {
+
         if (!reply.repliedBy) {
             return;
         }
 
-        setReplyingTo(reply.repliedBy);
+        setReplyingTo(
+            reply.repliedBy
+        );
+
         setOpenReply(index);
+
         setReplyText("");
+
         setReplyError("");
     };
 
@@ -473,21 +745,27 @@ const ComplimentCard = ({
     // CARD STYLE
     // =====================================================
 
-    const notificationCardStyle = highlighted
-        ? {
-              border:
-                  "3px solid #7c3aed",
-              boxShadow:
-                  "0 0 0 5px rgba(124, 58, 237, 0.18), 0 12px 35px rgba(124, 58, 237, 0.30)",
-              transform:
-                  "scale(1.015)",
-              transition:
-                  "all 0.3s ease",
-              position:
-                  "relative",
-              zIndex: 10,
-          }
-        : {};
+    const notificationCardStyle =
+        highlighted
+            ? {
+                  border:
+                      "3px solid #7c3aed",
+
+                  boxShadow:
+                      "0 0 0 5px rgba(124, 58, 237, 0.18), 0 12px 35px rgba(124, 58, 237, 0.30)",
+
+                  transform:
+                      "scale(1.015)",
+
+                  transition:
+                      "all 0.3s ease",
+
+                  position:
+                      "relative",
+
+                  zIndex: 10,
+              }
+            : {};
 
     // =====================================================
     // RENDER
@@ -501,8 +779,11 @@ const ComplimentCard = ({
                     ? "notification-highlight"
                     : ""
             }`}
-            style={notificationCardStyle}
+            style={
+                notificationCardStyle
+            }
         >
+
             {/* =================================================
                 NOTIFICATION LABEL
             ================================================= */}
@@ -510,16 +791,32 @@ const ComplimentCard = ({
             {highlighted && (
                 <div
                     style={{
-                        position: "absolute",
+                        position:
+                            "absolute",
+
                         top: "-14px",
+
                         left: "20px",
-                        background: "#7c3aed",
+
+                        background:
+                            "#7c3aed",
+
                         color: "white",
-                        padding: "6px 14px",
-                        borderRadius: "20px",
-                        fontSize: "13px",
-                        fontWeight: "700",
+
+                        padding:
+                            "6px 14px",
+
+                        borderRadius:
+                            "20px",
+
+                        fontSize:
+                            "13px",
+
+                        fontWeight:
+                            "700",
+
                         zIndex: 20,
+
                         boxShadow:
                             "0 4px 12px rgba(0,0,0,0.2)",
                     }}
@@ -536,7 +833,9 @@ const ComplimentCard = ({
             ================================================= */}
 
             <div className="card-top">
+
                 <div>
+
                     {item.isFeatured && (
                         <div className="featured-label">
                             ⭐ FEATURED
@@ -549,11 +848,14 @@ const ComplimentCard = ({
                             Anonymous
                         </span>
                     </div>
+
                 </div>
 
                 <span className="card-emoji">
-                    {item.emoji || "🌸"}
+                    {item.emoji ||
+                        "🌸"}
                 </span>
+
             </div>
 
             {/* =================================================
@@ -585,20 +887,29 @@ const ComplimentCard = ({
             ================================================= */}
 
             <div className="reaction-row">
+
                 {reactionList.map(
                     (reaction) => (
                         <ReactionButton
-                            key={reaction.name}
-                            emoji={reaction.emoji}
+                            key={
+                                reaction.name
+                            }
+
+                            emoji={
+                                reaction.emoji
+                            }
+
                             count={
                                 reactions[
                                     reaction.name
-                                ]
+                                ] || 0
                             }
+
                             selected={
                                 selectedReaction ===
                                 reaction.name
                             }
+
                             onClick={() =>
                                 handleReaction(
                                     reaction.name
@@ -613,13 +924,16 @@ const ComplimentCard = ({
                 <button
                     type="button"
                     className="report-btn"
-                    onClick={openReportModal}
+                    onClick={
+                        openReportModal
+                    }
                     disabled={reported}
                 >
                     {reported
                         ? "Reported"
                         : "Report"}
                 </button>
+
             </div>
 
             <div className="card-divider" />
@@ -630,8 +944,12 @@ const ComplimentCard = ({
 
             {localReplies.length > 0 && (
                 <div className="replies-section">
+
                     <div className="replies-title">
-                        <span>💌</span>
+
+                        <span>
+                            💌
+                        </span>
 
                         <span>
                             Replies
@@ -642,14 +960,17 @@ const ComplimentCard = ({
                                 localReplies.length
                             }
                         </span>
+
                     </div>
 
                     <div className="replies-list">
+
                         {localReplies.map(
                             (
                                 reply,
                                 replyIndex
                             ) => {
+
                                 const isHighlightedReply =
                                     highlightedReplyId &&
                                     String(
@@ -666,32 +987,43 @@ const ComplimentCard = ({
                                                 ? `reply-${reply._id}`
                                                 : undefined
                                         }
+
                                         className={`reply-item ${
                                             isHighlightedReply
                                                 ? "notification-reply-highlight"
                                                 : ""
                                         }`}
+
                                         style={
                                             isHighlightedReply
                                                 ? {
                                                       border:
                                                           "2px solid #ec4899",
+
                                                       background:
                                                           "rgba(236, 72, 153, 0.10)",
+
                                                       boxShadow:
                                                           "0 0 0 4px rgba(236, 72, 153, 0.12)",
+
                                                       transition:
                                                           "all 0.3s ease",
                                                   }
                                                 : {}
                                         }
+
                                         key={
                                             reply._id ||
                                             replyIndex
                                         }
                                     >
+
+                                        {/* REPLY HEADER */}
+
                                         <div className="reply-header">
+
                                             <div className="reply-user">
+
                                                 <span className="reply-avatar">
                                                     💙
                                                 </span>
@@ -699,6 +1031,7 @@ const ComplimentCard = ({
                                                 <span>
                                                     Anonymous
                                                 </span>
+
                                             </div>
 
                                             {reply.createdAt && (
@@ -715,11 +1048,16 @@ const ComplimentCard = ({
                                                     )}
                                                 </span>
                                             )}
+
                                         </div>
+
+                                        {/* REPLY MESSAGE */}
 
                                         <div className="reply-message">
                                             "{reply.text}"
                                         </div>
+
+                                        {/* REPLY TO PERSON */}
 
                                         {reply.repliedBy && (
                                             <button
@@ -734,11 +1072,14 @@ const ComplimentCard = ({
                                                 💬 Reply
                                             </button>
                                         )}
+
                                     </div>
                                 );
                             }
                         )}
+
                     </div>
+
                 </div>
             )}
 
@@ -753,9 +1094,14 @@ const ComplimentCard = ({
                         ? "reply-toggle-open"
                         : ""
                 }`}
-                onClick={toggleReplyBox}
+                onClick={
+                    toggleReplyBox
+                }
             >
-                <span>💬</span>
+
+                <span>
+                    💬
+                </span>
 
                 <span>
                     Reply anonymously
@@ -766,6 +1112,7 @@ const ComplimentCard = ({
                         ? "▲"
                         : "▼"}
                 </span>
+
             </button>
 
             {/* =================================================
@@ -774,16 +1121,22 @@ const ComplimentCard = ({
 
             {openReply === index && (
                 <div className="reply-box">
+
                     {replyingTo && (
                         <div className="replying-to">
+
                             <div className="replying-label">
-                                <span>💬</span>
+
+                                <span>
+                                    💬
+                                </span>
 
                                 <span>
                                     Replying
                                     to this
                                     person
                                 </span>
+
                             </div>
 
                             <button
@@ -793,6 +1146,7 @@ const ComplimentCard = ({
                                     setReplyingTo(
                                         null
                                     );
+
                                     setReplyError(
                                         ""
                                     );
@@ -801,11 +1155,14 @@ const ComplimentCard = ({
                             >
                                 ×
                             </button>
+
                         </div>
                     )}
 
                     <div className="reply-input-row">
+
                         <div className="reply-input-wrapper">
+
                             <span className="reply-input-icon">
                                 💬
                             </span>
@@ -821,6 +1178,7 @@ const ComplimentCard = ({
                                     setReplyText(
                                         e.target.value
                                     );
+
                                     setReplyError(
                                         ""
                                     );
@@ -830,6 +1188,7 @@ const ComplimentCard = ({
                                         e.key ===
                                         "Enter"
                                     ) {
+
                                         e.preventDefault();
 
                                         if (
@@ -841,6 +1200,7 @@ const ComplimentCard = ({
                                     }
                                 }}
                             />
+
                         </div>
 
                         <button
@@ -854,6 +1214,7 @@ const ComplimentCard = ({
                                 sendReply
                             }
                         >
+
                             {sendingReply ? (
                                 "Sending..."
                             ) : (
@@ -867,10 +1228,13 @@ const ComplimentCard = ({
                                     </span>
                                 </>
                             )}
+
                         </button>
+
                     </div>
 
                     <div className="reply-footer">
+
                         <span>
                             🔒 Your reply
                             stays
@@ -883,6 +1247,7 @@ const ComplimentCard = ({
                             }
                             /300
                         </span>
+
                     </div>
 
                     {replyError && (
@@ -898,6 +1263,7 @@ const ComplimentCard = ({
                             successfully!
                         </div>
                     )}
+
                 </div>
             )}
 
@@ -915,12 +1281,14 @@ const ComplimentCard = ({
                         )
                     }
                 >
+
                     <div
                         className="report-modal"
                         onClick={(e) =>
                             e.stopPropagation()
                         }
                     >
+
                         <div className="report-icon">
                             🚩
                         </div>
@@ -942,15 +1310,21 @@ const ComplimentCard = ({
                         {reportError && (
                             <div
                                 style={{
-                                    color: "#dc2626",
+                                    color:
+                                        "#dc2626",
+
                                     background:
                                         "#fee2e2",
+
                                     padding:
                                         "10px 12px",
+
                                     borderRadius:
                                         "8px",
+
                                     marginBottom:
                                         "15px",
+
                                     fontSize:
                                         "14px",
                                 }}
@@ -961,6 +1335,7 @@ const ComplimentCard = ({
                         )}
 
                         <div className="report-actions">
+
                             <button
                                 type="button"
                                 className="report-cancel"
@@ -990,8 +1365,11 @@ const ComplimentCard = ({
                                     ? "Reporting..."
                                     : "Yes, Report"}
                             </button>
+
                         </div>
+
                     </div>
+
                 </div>
             )}
 
@@ -1008,12 +1386,14 @@ const ComplimentCard = ({
                         )
                     }
                 >
+
                     <div
                         className="report-success-modal"
                         onClick={(e) =>
                             e.stopPropagation()
                         }
                     >
+
                         <div className="success-icon">
                             ✓
                         </div>
@@ -1044,9 +1424,12 @@ const ComplimentCard = ({
                         >
                             Done
                         </button>
+
                     </div>
+
                 </div>
             )}
+
         </article>
     );
 };

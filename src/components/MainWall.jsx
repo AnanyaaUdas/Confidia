@@ -8,7 +8,8 @@ import { useSearchParams } from "react-router-dom";
 
 import ComplimentCard from "./ComplimentCard";
 
-const API_BASE = "http://localhost:5000/api/compliments";
+const API_BASE =
+    "http://localhost:5000/api/compliments";
 
 const filters = [
     {
@@ -89,14 +90,16 @@ const MainWall = () => {
     // NOTIFICATION HIGHLIGHT
     // =====================================================
 
-    const [highlightedComplimentId, setHighlightedComplimentId] =
-        useState(null);
+    const [
+        highlightedComplimentId,
+        setHighlightedComplimentId,
+    ] = useState(null);
 
-    const [highlightedReplyId, setHighlightedReplyId] =
-        useState(null);
+    const [
+        highlightedReplyId,
+        setHighlightedReplyId,
+    ] = useState(null);
 
-    // Prevent notification from being processed
-    // multiple times.
     const notificationHandledRef =
         useRef(false);
 
@@ -122,6 +125,11 @@ const MainWall = () => {
                 const data =
                     await response.json();
 
+                console.log(
+                    "Compliments fetched from backend:",
+                    data
+                );
+
                 setCompliments(
                     Array.isArray(data)
                         ? data
@@ -132,6 +140,8 @@ const MainWall = () => {
                     "Failed to fetch compliments:",
                     error
                 );
+
+                setCompliments([]);
             } finally {
                 setLoading(false);
             }
@@ -139,6 +149,61 @@ const MainWall = () => {
 
         fetchCompliments();
     }, []);
+
+    // =====================================================
+    // UPDATE ONE COMPLIMENT AFTER REACTION
+    // =====================================================
+    //
+    // ComplimentCard calls this after MongoDB successfully
+    // updates the reaction.
+    //
+    // This keeps MainWall's local compliment list updated.
+    //
+    // =====================================================
+
+    const updateComplimentReactions = (
+        complimentId,
+        reactions
+    ) => {
+        setCompliments(
+            (prevCompliments) =>
+                prevCompliments.map(
+                    (compliment) => {
+                        if (
+                            String(
+                                compliment._id
+                            ) !==
+                            String(
+                                complimentId
+                            )
+                        ) {
+                            return compliment;
+                        }
+
+                        return {
+                            ...compliment,
+
+                            reactions: {
+                                heart:
+                                    Number(
+                                        reactions?.heart
+                                    ) || 0,
+
+                                smile:
+                                    Number(
+                                        reactions?.smile
+                                    ) || 0,
+
+                                clap:
+                                    Number(
+                                        reactions?.clap
+                                    ) || 0,
+                            },
+                        };
+                    }
+                )
+        );
+    };
 
     // =====================================================
     // SEARCH
@@ -202,15 +267,6 @@ const MainWall = () => {
     // =====================================================
     // HANDLE NOTIFICATION TARGET
     // =====================================================
-    //
-    // First we find the card.
-    // Then we switch to Everyone.
-    // Then we set the highlight.
-    //
-    // The actual scrolling happens in the
-    // next useEffect AFTER the card is rendered.
-    //
-    // =====================================================
 
     useEffect(() => {
         if (
@@ -221,8 +277,6 @@ const MainWall = () => {
             return;
         }
 
-        // Prevent processing the same notification
-        // repeatedly.
         if (
             notificationHandledRef.current
         ) {
@@ -240,7 +294,7 @@ const MainWall = () => {
 
         if (!targetCompliment) {
             console.warn(
-                "❌ Notification compliment not found:",
+                "Notification compliment not found:",
                 notificationComplimentId
             );
 
@@ -255,22 +309,22 @@ const MainWall = () => {
         }
 
         console.log(
-            "✅ Notification compliment found:",
+            "Notification compliment found:",
             targetCompliment
         );
 
         notificationHandledRef.current =
             true;
 
-        // -------------------------------------------------
-        // ALWAYS SHOW THE CARD
-        // -------------------------------------------------
+        // =================================================
+        // SHOW THE CARD
+        // =================================================
 
         setActiveFilter("everyone");
 
-        // -------------------------------------------------
+        // =================================================
         // HIGHLIGHT CARD
-        // -------------------------------------------------
+        // =================================================
 
         setHighlightedComplimentId(
             String(
@@ -278,9 +332,9 @@ const MainWall = () => {
             )
         );
 
-        // -------------------------------------------------
-        // HIGHLIGHT REPLY IF THERE IS ONE
-        // -------------------------------------------------
+        // =================================================
+        // HIGHLIGHT REPLY
+        // =================================================
 
         if (notificationReplyId) {
             setHighlightedReplyId(
@@ -292,9 +346,9 @@ const MainWall = () => {
             setHighlightedReplyId(null);
         }
 
-        // -------------------------------------------------
-        // FIND CARD INDEX AFTER FILTERING
-        // -------------------------------------------------
+        // =================================================
+        // OPEN REPLY BOX
+        // =================================================
 
         const targetIndex =
             compliments.findIndex(
@@ -309,17 +363,18 @@ const MainWall = () => {
             setOpenReply(targetIndex);
         }
 
-        // -------------------------------------------------
+        // =================================================
         // CLEAR URL
-        // -------------------------------------------------
+        // =================================================
 
-        setTimeout(() => {
-            setSearchParams({});
-        }, 1200);
+        const clearUrlTimer =
+            setTimeout(() => {
+                setSearchParams({});
+            }, 1200);
 
-        // -------------------------------------------------
-        // REMOVE HIGHLIGHT AFTER 5 SECONDS
-        // -------------------------------------------------
+        // =================================================
+        // REMOVE HIGHLIGHT
+        // =================================================
 
         const highlightTimer =
             setTimeout(() => {
@@ -334,6 +389,10 @@ const MainWall = () => {
 
         return () => {
             clearTimeout(
+                clearUrlTimer
+            );
+
+            clearTimeout(
                 highlightTimer
             );
         };
@@ -347,13 +406,6 @@ const MainWall = () => {
 
     // =====================================================
     // SCROLL TO HIGHLIGHTED CARD
-    // =====================================================
-    //
-    // THIS IS THE IMPORTANT PART.
-    //
-    // We wait until React has actually rendered
-    // ComplimentCard before trying to find it.
-    //
     // =====================================================
 
     useEffect(() => {
@@ -378,7 +430,7 @@ const MainWall = () => {
             }
 
             console.log(
-                "✅ Scrolling to highlighted card:",
+                "Scrolling to highlighted card:",
                 highlightedComplimentId
             );
 
@@ -390,7 +442,6 @@ const MainWall = () => {
             return true;
         };
 
-        // Give React time to render.
         const timer1 =
             setTimeout(() => {
                 scrollToCard();
@@ -556,6 +607,18 @@ const MainWall = () => {
                                     setReplyText
                                 }
 
+                                // =================================================
+                                // REACTION UPDATE
+                                // =================================================
+
+                                onReactionUpdated={
+                                    updateComplimentReactions
+                                }
+
+                                // =================================================
+                                // NOTIFICATION
+                                // =================================================
+
                                 highlighted={
                                     String(
                                         highlightedComplimentId
@@ -592,6 +655,7 @@ const MainWall = () => {
                 )}
 
             </div>
+
         </section>
     );
 };

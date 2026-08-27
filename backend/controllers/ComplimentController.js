@@ -11,10 +11,7 @@ const createCompliment = async (req, res) => {
 
         res.status(201).json(compliment);
     } catch (error) {
-        console.error(
-            "CREATE COMPLIMENT ERROR:",
-            error
-        );
+        console.error("CREATE COMPLIMENT ERROR:", error);
 
         res.status(500).json({
             message: "Failed to create compliment",
@@ -34,10 +31,7 @@ const getCompliments = async (req, res) => {
 
         res.status(200).json(compliments);
     } catch (error) {
-        console.error(
-            "GET COMPLIMENTS ERROR:",
-            error
-        );
+        console.error("GET COMPLIMENTS ERROR:", error);
 
         res.status(500).json({
             message: "Failed to get compliments",
@@ -54,12 +48,8 @@ const searchCompliments = async (req, res) => {
     try {
         const { keyword } = req.query;
 
-        // If there is no keyword,
-        // return all compliments.
-        if (
-            !keyword ||
-            keyword.trim() === ""
-        ) {
+        // If there is no keyword, return all compliments
+        if (!keyword || keyword.trim() === "") {
             const compliments = await Compliment.find()
                 .sort({ createdAt: -1 });
 
@@ -97,10 +87,7 @@ const searchCompliments = async (req, res) => {
 
         res.status(200).json(compliments);
     } catch (error) {
-        console.error(
-            "SEARCH COMPLIMENTS ERROR:",
-            error
-        );
+        console.error("SEARCH COMPLIMENTS ERROR:", error);
 
         res.status(500).json({
             message: "Failed to search compliments",
@@ -110,7 +97,7 @@ const searchCompliments = async (req, res) => {
 };
 
 // =====================================================
-// ADD REACTION TO A COMPLIMENT
+// ADD / REMOVE REACTION TO A COMPLIMENT
 // =====================================================
 
 const addReaction = async (req, res) => {
@@ -118,16 +105,16 @@ const addReaction = async (req, res) => {
         const {
             reaction,
             reactedBy,
+            action,
         } = req.body;
 
         // =================================================
         // FIND COMPLIMENT
         // =================================================
 
-        const compliment =
-            await Compliment.findById(
-                req.params.id
-            );
+        const compliment = await Compliment.findById(
+            req.params.id
+        );
 
         if (!compliment) {
             return res.status(404).json({
@@ -140,11 +127,7 @@ const addReaction = async (req, res) => {
         // =================================================
 
         if (
-            ![
-                "heart",
-                "smile",
-                "clap",
-            ].includes(reaction)
+            !["heart", "smile", "clap"].includes(reaction)
         ) {
             return res.status(400).json({
                 message: "Invalid reaction",
@@ -152,7 +135,7 @@ const addReaction = async (req, res) => {
         }
 
         // =================================================
-        // MAKE SURE REACTIONS EXISTS
+        // MAKE SURE REACTIONS EXIST
         // =================================================
 
         if (!compliment.reactions) {
@@ -171,59 +154,68 @@ const addReaction = async (req, res) => {
         }
 
         // =================================================
-        // ADD REACTION
+        // ADD OR REMOVE REACTION
         // =================================================
 
-        compliment.reactions[reaction] += 1;
+        if (action === "remove") {
+            // Remove reaction
+            compliment.reactions[reaction] = Math.max(
+                0,
+                compliment.reactions[reaction] - 1
+            );
+        } else {
+            // Add reaction
+            compliment.reactions[reaction] += 1;
+        }
+
+        // =================================================
+        // SAVE TO DATABASE
+        // =================================================
 
         await compliment.save();
 
         // =================================================
-        // REACTION EMOJIS
+        // ONLY CREATE NOTIFICATION WHEN ADDING
         // =================================================
 
-        const reactionEmojis = {
-            heart: "❤️",
-            smile: "😊",
-            clap: "👏",
-        };
+        if (action !== "remove") {
+            const reactionEmojis = {
+                heart: "❤️",
+                smile: "😊",
+                clap: "👏",
+            };
 
-        // =================================================
-        // NOTIFY COMPLIMENT OWNER
-        // =================================================
+            const notificationRecipient =
+                compliment.createdBy;
 
-        const notificationRecipient =
-            compliment.createdBy;
+            // Don't notify user if they reacted
+            // to their own compliment
+            if (
+                notificationRecipient &&
+                (
+                    !reactedBy ||
+                    notificationRecipient.toString() !==
+                        reactedBy.toString()
+                )
+            ) {
+                await Notification.create({
+                    recipient:
+                        notificationRecipient,
 
-        // Don't notify the person if they reacted
-        // to their own compliment.
+                    type: "reaction",
 
-        if (
-            notificationRecipient &&
-            (
-                !reactedBy ||
-                notificationRecipient.toString() !==
-                    reactedBy.toString()
-            )
-        ) {
-            await Notification.create({
-                recipient:
-                    notificationRecipient,
+                    emoji:
+                        reactionEmojis[reaction],
 
-                type: "reaction",
+                    message:
+                        `Someone reacted ${reactionEmojis[reaction]} to your compliment.`,
 
-                emoji:
-                    reactionEmojis[reaction],
+                    complimentId:
+                        compliment._id,
 
-                message:
-                    `Someone reacted ${reactionEmojis[reaction]} to your compliment.`,
-
-                complimentId:
-                    compliment._id,
-
-                // Reactions don't have a reply.
-                replyId: null,
-            });
+                    replyId: null,
+                });
+            }
         }
 
         // =================================================
@@ -231,14 +223,12 @@ const addReaction = async (req, res) => {
         // =================================================
 
         res.status(200).json(compliment);
+
     } catch (error) {
-        console.error(
-            "REACTION ERROR:",
-            error
-        );
+        console.error("REACTION ERROR:", error);
 
         res.status(500).json({
-            message: "Failed to add reaction",
+            message: "Failed to update reaction",
             error: error.message,
         });
     }
@@ -260,13 +250,9 @@ const replyToCompliment = async (req, res) => {
         // VALIDATE TEXT
         // =================================================
 
-        if (
-            !text ||
-            !text.trim()
-        ) {
+        if (!text || !text.trim()) {
             return res.status(400).json({
-                message:
-                    "Reply text is required",
+                message: "Reply text is required",
             });
         }
 
@@ -274,15 +260,13 @@ const replyToCompliment = async (req, res) => {
         // FIND COMPLIMENT
         // =================================================
 
-        const compliment =
-            await Compliment.findById(
-                req.params.id
-            );
+        const compliment = await Compliment.findById(
+            req.params.id
+        );
 
         if (!compliment) {
             return res.status(404).json({
-                message:
-                    "Compliment not found",
+                message: "Compliment not found",
             });
         }
 
@@ -293,13 +277,11 @@ const replyToCompliment = async (req, res) => {
         const newReply = {
             text: text.trim(),
 
-            // Person who sent this reply
-            repliedBy:
-                repliedBy || null,
+            // Person who sent the reply
+            repliedBy: repliedBy || null,
 
-            // Person whose reply this is responding to
-            repliedTo:
-                repliedTo || null,
+            // Person whose reply this responds to
+            repliedTo: repliedTo || null,
 
             createdAt: new Date(),
         };
@@ -327,7 +309,7 @@ const replyToCompliment = async (req, res) => {
 
         /*
             CASE 1:
-            
+
             Person A creates compliment.
             Person B replies.
 
@@ -351,8 +333,7 @@ const replyToCompliment = async (req, res) => {
         */
 
         const notificationRecipient =
-            repliedTo ||
-            compliment.createdBy;
+            repliedTo || compliment.createdBy;
 
         // =================================================
         // DEBUG
@@ -405,8 +386,8 @@ const replyToCompliment = async (req, res) => {
         // =================================================
 
         /*
-            Don't notify someone if they are replying
-            to themselves.
+            Don't notify someone if they are
+            replying to themselves.
         */
 
         if (
@@ -436,14 +417,11 @@ const replyToCompliment = async (req, res) => {
                 message:
                     notificationMessage,
 
-                // VERY IMPORTANT
-                // Which card should be opened?
+                // Which compliment/card should open
                 complimentId:
                     compliment._id,
 
-                // VERY IMPORTANT
-                // Which exact reply should be
-                // highlighted/opened?
+                // Which exact reply should be highlighted
                 replyId:
                     savedReply._id,
             });
@@ -471,6 +449,7 @@ const replyToCompliment = async (req, res) => {
                 "Message:",
                 notificationMessage
             );
+
         } else {
             console.log(
                 "⚠️ NO REPLY NOTIFICATION CREATED"
@@ -486,26 +465,19 @@ const replyToCompliment = async (req, res) => {
         // =================================================
 
         res.status(201).json({
-            message:
-                "Reply added successfully",
+            message: "Reply added successfully",
 
-            reply:
-                savedReply,
+            reply: savedReply,
 
             compliment,
         });
+
     } catch (error) {
-        console.error(
-            "REPLY ERROR:",
-            error
-        );
+        console.error("REPLY ERROR:", error);
 
         res.status(500).json({
-            message:
-                "Failed to add reply",
-
-            error:
-                error.message,
+            message: "Failed to add reply",
+            error: error.message,
         });
     }
 };
