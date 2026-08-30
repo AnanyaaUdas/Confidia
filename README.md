@@ -1,68 +1,67 @@
-# 💗 Confidia
+# Confidia — polished user experience
 
-Confidia is an anonymous platform for college students to share compliments, appreciation, and positive messages with people in their college community.
+Anonymous campus kindness wall: compliments, reactions, replies, chat, badges, and admin moderation.
 
-The goal of Confidia is to create a safe and positive digital space where students can appreciate others without feeling pressured to reveal their identity.
-
-## ✨ Features
-
-- 💌 **Anonymous Compliments**  
-  Write and share compliments without revealing your identity.
-
-- 🌸 **Kindness Wall**  
-  View positive messages shared by students.
-
-- 🎯 **Kindness Prompts**  
-  Get random prompts to help you think of something kind to say.
-
-- 🎲 **Kindness Wheel**  
-  Generate a random kindness prompt whenever you need inspiration.
-
-- 🏷️ **Categories**  
-  Organize compliments into categories such as:
-  - Everyone
-  - Friends
-  - Teachers
-  - College
-  - Clubs
-
-- 😊 **Mood Selection**  
-  Choose the mood behind your compliment, such as:
-  - Grateful
-  - Happy
-  - Inspired
-  - Proud
-  - Appreciative
-
-- 💌 **Anonymous Replies**  
-  Recipients can respond to compliments anonymously.
-
-- 🚨 **Moderation & Reporting**  
-  Content can be reported for review to help maintain a positive environment.
-
-- 📱 **Responsive Design**  
-  The interface is designed to work across desktop, tablet, and mobile devices.
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- React
-- JavaScript
-- HTML5
-- CSS3
-- Vite
-- React Router
+## What’s improved (user side)
 
 ### Backend
+- Stronger auth validation (name, email, password length, optional custom username)
+- Day-streak tracking on login / session restore / posting
+- Fixed `reactionsGiven` field on login response
+- `GET /api/auth/profile` — user stats, computed badges, own compliments
+- Safer compliment create (length limits, category normalization, streak touch)
+- Longer JWT lifetime (14d)
 
-- Node.js
-- Express.js
+### UI / UX
+- Sticky glass-style navbar with avatar chip, active links, mobile menu
+- Full Profile page: stats, badges, your anonymous posts, guest CTA
+- Wall loading skeletons + friendlier empty states
+- Write page inline success/error (no more bare `alert`s)
+- Polished login/register already present; consistent purple/pink campus theme
+- Badge unlock celebration popup when a new badge is earned
 
-### Database
+## Environment
 
-- MongoDB
+`backend/.env`:
 
-### Data & Storage
+```
+PORT=4000
+MONGO_URI=mongodb://127.0.0.1:27017/confidia
+JWT_SECRET=Confidia_secret_home
+ADMIN_USER=admin
+ADMIN_PASS=confidia2026
+```
 
-- LocalStorage
+Change these before deploying anywhere real — the values above are just for local dev.
+
+## Run
+
+MongoDB on `127.0.0.1:27017`:
+
+```bash
+cd backend && npm install && npm run dev
+cd .. && npm install && npm run dev
+```
+
+Frontend: http://localhost:5173  
+Backend:  http://localhost:4000
+
+## Auth
+
+- Student register/login: `/user-register`, `/user-login`
+- Admin: `/admin-login` → `admin` / `confidia2026`
+- Write / react / report require a logged-in **user**
+
+## API map
+
+| Path | Notes |
+|------|--------|
+| `/api/auth/*` | register, login |
+| `/api/auth/me` | session + streak touch |
+| `/api/auth/profile` | stats, badges, my posts |
+| `/api/wall` | formatted feed + POST create |
+| `/api/compliments/*` | modular CRUD + react/report |
+| `/api/notifications/*` | user notifications |
+| `/api/admin/*` | moderation |
+| `/api/stats` | homepage counters |
+| Socket.io | campus anonymous chat |

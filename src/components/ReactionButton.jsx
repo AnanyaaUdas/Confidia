@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import ReactionBurst from "./ReactionBurst";
 
-const ReactionButton = ({
-  emoji,
-  count,
-  selected,
-  onClick,
-}) => {
+const ReactionButton = ({ emoji, count, selected, onClick }) => {
   const [showBurst, setShowBurst] = useState(false);
 
   const handleClick = () => {
@@ -24,22 +19,14 @@ const ReactionButton = ({
 
   return (
     <button
-      className={`reaction-btn ${
-        selected ? "reaction-selected" : ""
-      }`}
+      className={`reaction-btn ${selected ? "reaction-selected" : ""}`}
       onClick={handleClick}
     >
-      <span className="reaction-emoji">
-        {emoji}
-      </span>
+      <span className="reaction-emoji">{emoji}</span>
 
-      <span className="reaction-count">
-        {count}
-      </span>
+      <span className="reaction-count">{count}</span>
 
-      {showBurst && (
-        <ReactionBurst emoji={emoji} />
-      )}
+      {showBurst && <ReactionBurst emoji={emoji} />}
     </button>
   );
 };

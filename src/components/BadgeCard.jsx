@@ -1,40 +1,17 @@
 import React from "react";
 
-const BadgeCard = ({
-    emoji,
-    title,
-    description,
-    progress,
-    unlocked,
-}) => {
+const BadgeCard = ({ emoji, title, description, progress, unlocked }) => {
+  return (
+    <div className={`badge-card ${unlocked ? "unlocked" : ""}`}>
+      <div className="badge-icon">{emoji}</div>
 
-    return (
-        <div
-            className={`badge-card ${
-                unlocked
-                    ? "unlocked"
-                    : ""
-            }`}
-        >
+      <h3>{title}</h3>
 
-            <div className="badge-icon">
-                {emoji}
-            </div>
+      <p>{description}</p>
 
-            <h3>
-                {title}
-            </h3>
-
-            <p>
-                {description}
-            </p>
-
-            <span className="badge-progress">
-                {progress}
-            </span>
-
-        </div>
-    );
+      <span className="badge-progress">{progress}</span>
+    </div>
+  );
 };
 
 export default BadgeCard;

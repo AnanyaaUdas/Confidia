@@ -1,184 +1,168 @@
-/* =====================================================
-   WALL HEADER
-===================================================== */
+/* WALL HEADER */
 
 .wall-header {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding-top: 50px;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding-top: 50px;
 }
 
 .wall-header h1 {
-    margin: 0;
+  margin: 0;
 
-    font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, "Times New Roman", serif;
 
-    font-size: 38px;
+  font-size: 38px;
 
-    color: #38345a;
+  color: #38345a;
 }
 
 .wall-header p {
-    margin-top: 8px;
+  margin-top: 8px;
 
-    color: #887fa8;
+  color: #887fa8;
 
-    font-size: 17px;
+  font-size: 17px;
 }
 
-
-/* =====================================================
-   SEARCH
-===================================================== */
+/* SEARCH */
 
 .wall-search {
-    max-width: 1220px;
-    margin: 75px auto 0;
+  max-width: 1220px;
+  margin: 75px auto 0;
 
-    width: 420px;
+  width: 420px;
 
-    height: 56px;
+  height: 56px;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    gap: 12px;
+  gap: 12px;
 
-    padding: 0 20px;
+  padding: 0 20px;
 
-    border: 1px solid #e8ddff;
+  border: 1px solid #e8ddff;
 
-    border-radius: 30px;
+  border-radius: 30px;
 
-    background: white;
+  background: white;
 }
 
 .wall-search span {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .wall-search input {
-    flex: 1;
+  flex: 1;
 
-    border: none;
+  border: none;
 
-    outline: none;
+  outline: none;
 
-    background: transparent;
+  background: transparent;
 
-    font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif;
 
-    font-size: 16px;
+  font-size: 16px;
 
-    color: #4d4668;
+  color: #4d4668;
 }
 
 .wall-search input::placeholder {
-    color: #9188ad;
+  color: #9188ad;
 }
 
-
-/* =====================================================
-   FILTER BUTTONS
-===================================================== */
+/* FILTER BUTTONS */
 
 .filter-row {
-    max-width: 1220px;
-    margin: 18px auto 30px;
+  max-width: 1220px;
+  margin: 18px auto 30px;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    gap: 10px;
+  gap: 10px;
 }
 
 .filter-btn {
-    height: 48px;
+  height: 48px;
 
-    padding: 0 22px;
+  padding: 0 22px;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    justify-content: center;
+  justify-content: center;
 
-    gap: 8px;
+  gap: 8px;
 
-    border: 1px solid #e5dcfa;
+  border: 1px solid #e5dcfa;
 
-    border-radius: 30px;
+  border-radius: 30px;
 
-    background: white;
+  background: white;
 
-    color: #3f395c;
+  color: #3f395c;
 
-    font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif;
 
-    font-size: 15px;
+  font-size: 15px;
 
-    font-weight: 500;
+  font-weight: 500;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 .filter-btn:hover {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 
-    border-color: #cdbaff;
+  border-color: #cdbaff;
 
-    box-shadow:
-        0 7px 18px rgba(123, 97, 255, 0.10);
+  box-shadow: 0 7px 18px rgba(123, 97, 255, 0.1);
 }
-
 
 /* ACTIVE FILTER */
 
 .filter-btn.active {
-    background: #3e3657;
+  background: #3e3657;
 
-    border-color: #3e3657;
+  border-color: #3e3657;
 
-    color: white;
+  color: white;
 
-    box-shadow:
-        0 8px 20px rgba(62, 54, 87, 0.18);
+  box-shadow: 0 8px 20px rgba(62, 54, 87, 0.18);
 }
 
 .filter-btn.active:hover {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 }
 
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+/* RESPONSIVE */
 
 @media (max-width: 800px) {
+  .wall-header {
+    margin: 0 25px;
+  }
 
-    .wall-header {
-        margin: 0 25px;
-    }
+  .wall-search {
+    width: auto;
 
-    .wall-search {
-        width: auto;
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 75px;
+  }
 
-        margin-left: 25px;
-        margin-right: 25px;
-        margin-top: 75px;
-    }
+  .filter-row {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 18px;
+    margin-bottom: 30px;
 
-    .filter-row {
-        margin-left: 25px;
-        margin-right: 25px;
-        margin-top: 18px;
-        margin-bottom: 30px;
-
-        flex-wrap: wrap;
-    }
-
+    flex-wrap: wrap;
+  }
 }

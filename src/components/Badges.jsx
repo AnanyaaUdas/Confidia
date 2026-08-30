@@ -1,6 +1,7 @@
 import React from "react";
 import ProfilePage from "./ProfilePage";
 import useAppStore from "../store/useAppStore";
+import { Link } from "react-router-dom";
 
 const kindnessCloud = [
   { word: "Helpful", size: "lg", color: "pink" },
@@ -13,86 +14,69 @@ const kindnessCloud = [
 ];
 
 const Badges = () => {
-
-  // DEV-ONLY toggle to preview logged-in state
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
-  const toggleLogin = useAppStore((state) => state.toggleLogin);
-
-  // User from Zustand
   const User = useAppStore((state) => state.User);
+
+  const displayName =
+    User?.username ||
+    [User?.firstName, User?.lastName].filter(Boolean).join(" ") ||
+    "Friend";
+
+  const initial = (displayName || "C").charAt(0).toUpperCase();
 
   return (
     <div className="profile-page">
-
-      <button
-        className="dev-toggle"
-        onClick={toggleLogin}
-      >
-        Dev: {isLoggedIn ? "Log out" : "Log in"} preview
-      </button>
-
-      {/* WELCOME CARD — only when logged in */}
-
-      {isLoggedIn && (
-        
-
+      {isLoggedIn && User ? (
         <div className="welcome-card">
-           
-          <div className="welcome-avatar">
-            {User.name.charAt(0)}
-          </div>
+          <div className="welcome-avatar">{initial}</div>
 
           <div className="welcome-info">
-
-            <h3>{User.name}</h3>
-
+            <h3>{displayName}</h3>
             <span className="welcome-since">
-              Member since {User.memberSince}
+              Member since{" "}
+              {User.memberSince
+                ? new Date(User.memberSince).toLocaleDateString(undefined, {
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "—"}
             </span>
 
             <div className="welcome-stats">
-
               <div className="welcome-stat">
-                <strong>{User.complimentsShared}</strong>
+                <strong>{User.complimentsShared ?? 0}</strong>
                 <span>Compliments shared</span>
               </div>
-
               <div className="welcome-stat">
-                <strong>{User.reactionsGiven}</strong>
+                <strong>{User.reactionsGiven ?? 0}</strong>
                 <span>Reactions given</span>
               </div>
-
               <div className="welcome-stat">
-                <strong>{User.dayStreak}</strong>
+                <strong>{User.dayStreak ?? 0}</strong>
                 <span>Day streak</span>
               </div>
-
             </div>
-
           </div>
-
-          <button className="welcome-edit">
-            Edit profile
-          </button>
-
         </div>
-
+      ) : (
+        <div className="welcome-card" style={{ justifyContent: "center" }}>
+          <div className="welcome-info">
+            <h3>Your kindness profile</h3>
+            <p style={{ color: "#948aad", marginBottom: 12 }}>
+              Log in to track compliments, reactions, and badges.
+            </p>
+            <Link to="/user-login" className="profile-btn">
+              Log in →
+            </Link>
+          </div>
+        </div>
       )}
-
-      {/* PROFILE / BADGES */}
 
       <ProfilePage />
 
-      {/* KINDNESS CLOUD */}
-
       <div className="kindness-cloud">
-
-        <div className="cloud-label">
-          ☁ KINDNESS CLOUD
-        </div>
-
+        <div className="cloud-label">☁ KINDNESS CLOUD</div>
         <div className="cloud-words">
-
           {kindnessCloud.map((tag, index) => (
             <span
               key={index}
@@ -101,11 +85,8 @@ const Badges = () => {
               {tag.word}
             </span>
           ))}
-
         </div>
-
       </div>
-
     </div>
   );
 };

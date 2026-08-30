@@ -1,37 +1,108 @@
 const mongoose = require("mongoose");
 
 const complimentSchema = new mongoose.Schema(
-    {
-        to:{
-            type: String,
-            required: true,
-        },
-        message: {
-            type: String,
-            required: true,
-        },
-        category: {
-            type:String,
-            required: true,
-        },
-        isFeatured: {
-            type: Boolean,
-            default: false,
-        },
-        reactions: {
-            heart: {
-                type: Number,
-                default: 0,
-            },
-            claps: {
-                type: Number,
-                default: 0
-            },
-        },
+  {
+    to: {
+      type: String,
+      required: true,
     },
-    {
-        timestamps: true,
-    }
+
+    message: {
+      type: String,
+      required: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+    },
+
+    mood: {
+      type: String,
+      default: "Grateful",
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    // moderation flags used by admin dashboard
+    reported: {
+      type: Boolean,
+      default: false,
+    },
+    reportReason: {
+      type: String,
+      default: null,
+    },
+    emoji: {
+      type: String,
+      default: "💌",
+    },
+
+    reactions: {
+      heart: {
+        type: Number,
+        default: 0,
+      },
+      smile: {
+        type: Number,
+        default: 0,
+      },
+      clap: {
+        type: Number,
+        default: 0,
+      },
+
+      reactedBy: [
+        {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+          reaction: {
+            type: String,
+            enum: ["heart", "smile", "clap"],
+          },
+        },
+      ],
+    },
+    replies: [
+      {
+        text: {
+          type: String,
+          required: true,
+        },
+
+        repliedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: false,
+        },
+
+        // The user this reply is directed to
+        repliedTo: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: false,
+        },
+
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+  },
+
+  {
+    timestamps: true,
+  },
 );
 
 module.exports = mongoose.model("Compliment", complimentSchema);

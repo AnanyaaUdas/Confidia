@@ -1,174 +1,196 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import useAppStore from "../store/useAppStore";
+import {
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+} from "../api";
 
-// MOCK DATA — replace with a fetch() call once backend exists
-const mockNotifications = [
-    {
-        id: 1,
-        type: "reaction",
-        emoji: "❤️",
-        text: "Someone reacted to your compliment to COMPUTER SCIENCE DEPARTMENT",
-        time: "2m ago",
-        read: false,
-    },
-    {
-        id: 2,
-        type: "reply",
-        emoji: "💬",
-        text: "Someone replied to your compliment to LIBRARY STAFF",
-        time: "1h ago",
-        read: false,
-    },
-    {
-        id: 3,
-        type: "reaction",
-        emoji: "👏",
-        text: "Someone reacted to your compliment to DRAMA CLUB",
-        time: "5h ago",
-        read: false,
-    },
-    {
-        id: 4,
-        type: "reply",
-        emoji: "💬",
-        text: "Someone replied to your compliment to WHOEVER FOUND MY WALLET",
-        time: "1d ago",
-        read: true,
-    },
-];
+function relativeTime(date) {
+  if (!date) return "";
+  const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (s < 60) return "Just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
 
 const NotificationBell = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const ref = useRef(null);
+  const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  const User = useAppStore((s) => s.User);
 
-    const [open, setOpen] = useState(false);
+  const load = async () => {
+    if (!isLoggedIn || !User?.id) {
+      setItems([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await fetchNotifications(User.id);
+      const list = Array.isArray(data) ? data : data.notifications || [];
+      setItems(
+        list.map((n) => ({
+          id: (n._id || n.id || "").toString(),
+          type: n.type,
+          emoji:
+            n.emoji || (n.type === "reply" ? "💬" : n.type === "reaction" ? "❤️" : "🔔"),
+          text: n.message || n.text || "New notification",
+          time: relativeTime(n.createdAt),
+          read: !!(n.read || n.isRead),
+          complimentId: n.complimentId
+            ? (n.complimentId._id || n.complimentId).toString()
+            : null,
+          replyId: n.replyId ? n.replyId.toString() : null,
+        })),
+      );
+    } catch (e) {
+      console.error("notifications:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const [notifications, setNotifications] =
-        useState(mockNotifications);
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 25000);
+    return () => clearInterval(t);
+  }, [isLoggedIn, User?.id]);
 
-    const dropdownRef = useRef(null);
-
-
-    const unreadCount = notifications.filter(
-        (n) => !n.read
-    ).length;
-
-
-    const markAsRead = (id) => {
-        setNotifications((prev) =>
-            prev.map((n) =>
-                n.id === id
-                    ? { ...n, read: true }
-                    : n
-            )
-        );
+  useEffect(() => {
+    const onDoc = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
 
-    const markAllAsRead = () => {
-        setNotifications((prev) =>
-            prev.map((n) => ({ ...n, read: true }))
-        );
-    };
+  const unread = items.filter((n) => !n.read).length;
 
+  const onOpen = () => {
+    setOpen((v) => !v);
+    if (!open) load();
+  };
 
-    // Close dropdown when clicking outside
+  const onMarkOne = async (id) => {
+    if (!id) return;
+    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try {
+      await markNotificationRead(id);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(e.target)
-            ) {
-                setOpen(false);
-            }
-        };
+  const onNotificationClick = async (n) => {
+    if (!n.complimentId) {
+      await onMarkOne(n.id);
+      setOpen(false);
+      return;
+    }
 
-        document.addEventListener("mousedown", handleClickOutside);
+    sessionStorage.setItem(
+      "notificationNavigation",
+      JSON.stringify({
+        complimentId: n.complimentId,
+        replyId: n.replyId || null,
+        type: n.type,
+        timestamp: Date.now(),
+      }),
+    );
 
-        return () =>
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
-    }, []);
+    await onMarkOne(n.id);
+    setOpen(false);
 
+    if (location.pathname !== "/wall") {
+      navigate("/wall");
+    } else {
+      window.dispatchEvent(new Event("notification-navigation"));
+    }
+  };
 
-    return (
-        <div className="notif-wrapper" ref={dropdownRef}>
+  const onMarkAll = async () => {
+    if (!User?.id) return;
+    setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await markAllNotificationsRead(User.id);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-            <button
-                className="notif-bell"
-                onClick={() => setOpen((prev) => !prev)}
-            >
-                🔔
-                {unreadCount > 0 && (
-                    <span className="notif-badge">
-                        {unreadCount}
-                    </span>
-                )}
-            </button>
+  return (
+    <div className="notif-wrapper" ref={ref}>
+      <button
+        type="button"
+        className="notif-bell"
+        onClick={onOpen}
+        aria-label="Notifications"
+        aria-expanded={open}
+      >
+        🔔
+        {unread > 0 && <span className="notif-badge">{unread > 9 ? "9+" : unread}</span>}
+      </button>
 
-            {open && (
+      {open && (
+        <div className="notif-dropdown" role="dialog" aria-label="Notifications">
+          <div className="notif-header">
+            <h4>Notifications</h4>
+            {isLoggedIn && unread > 0 && (
+              <button type="button" className="notif-mark-all" onClick={onMarkAll}>
+                Mark all read
+              </button>
+            )}
+          </div>
 
-                <div className="notif-dropdown">
-
-                    <div className="notif-header">
-
-                        <h4>Notifications</h4>
-
-                        {unreadCount > 0 && (
-                            <button
-                                className="notif-mark-all"
-                                onClick={markAllAsRead}
-                            >
-                                Mark all read
-                            </button>
-                        )}
-
-                    </div>
-
-                    <div className="notif-list">
-
-                        {notifications.length === 0 && (
-                            <div className="notif-empty">
-                                You're all caught up 🌸
-                            </div>
-                        )}
-
-                        {notifications.map((n) => (
-
-                            <div
-                                key={n.id}
-                                className={`notif-item ${
-                                    n.read ? "" : "unread"
-                                }`}
-                                onClick={() => markAsRead(n.id)}
-                            >
-
-                                <span className="notif-icon">
-                                    {n.emoji}
-                                </span>
-
-                                <div className="notif-text">
-                                    <p>{n.text}</p>
-                                    <span className="notif-time">
-                                        {n.time}
-                                    </span>
-                                </div>
-
-                                {!n.read && (
-                                    <span className="notif-dot"></span>
-                                )}
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                </div>
-
+          <div className="notif-list">
+            {!isLoggedIn && (
+              <div className="notif-empty">
+                <p>Log in to see reactions & replies on your compliments.</p>
+                <Link
+                  to="/user-login"
+                  className="notif-login-link"
+                  onClick={() => setOpen(false)}
+                >
+                  User login →
+                </Link>
+              </div>
             )}
 
+            {isLoggedIn && loading && items.length === 0 && (
+              <div className="notif-empty">Loading…</div>
+            )}
+
+            {isLoggedIn && !loading && items.length === 0 && (
+              <div className="notif-empty">🌸 No notifications yet</div>
+            )}
+
+            {items.map((n) => (
+              <button
+                type="button"
+                key={n.id}
+                className={`notif-item ${n.read ? "" : "unread"}`}
+                onClick={() => onNotificationClick(n)}
+              >
+                <span className="notif-icon">{n.emoji}</span>
+                <div className="notif-text">
+                  <p>{n.text}</p>
+                  <span className="notif-time">{n.time}</span>
+                </div>
+                {!n.read && <span className="notif-dot" aria-hidden="true" />}
+              </button>
+            ))}
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default NotificationBell;
