@@ -1,5 +1,4 @@
-const API = "http://localhost:4000/api";
-
+const API = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 function userHeaders(extra = {}) {
   const token = localStorage.getItem("confidia_user_token");
   return {
